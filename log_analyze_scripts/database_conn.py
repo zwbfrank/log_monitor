@@ -1,7 +1,7 @@
-import os
-import sys
-import django
+#!/usr/bin/env python
+
 import pymysql
+import log_analyze as lan
 
 #databases config
 config = {
@@ -31,10 +31,31 @@ def get_log_path():
 	# conn.close()
 	return log_path
 
+# class DataConn():
+# 	"""
+# 		database connection about pymysql.
+# 	"""
+
+# 	def __init__(self,):
+# 		pass
+
 if __name__ == '__main__':
 
-	data = get_log_path()
-	print(data)
+
+	log_path = get_log_path()
+	la = lan.LogAnalyze(log_path)
+	
+	content = la.log_analyze()
+	log_level = la.level
+	conn = pymysql_conn()
+	cursor = conn.cursor()
+
+	cursor.execute("insert into log_analyze_logdata (id,log_type,log_level,content) values (%s,%s,%s,%s)",
+					['2','PAYLOG',log_level,content])
+	conn.commit()
+	cursor.close()
+	conn.close()
+
 
 
 

@@ -1,6 +1,5 @@
 from django import forms
 
-
 class LogMonitorForm(forms.Form):
 	TOPIC_CHOICES = (
 		('type1','userLog'),
