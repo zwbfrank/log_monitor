@@ -4,10 +4,10 @@ import os
 import signal
 import subprocess
 import time
-from database_conn import get_log_path
+# from database_conn import get_log_path
 #测试使用日志文件   
 # logFile1="..\sample\sample_logs\log_json\_19_19_56.testlog"
-logFile1 = get_log_path()
+# logFile1 = get_log_path()
 # with open(logFile1) as f:
 # 	f = f.readline()
 # 	print(f)
@@ -41,4 +41,10 @@ def log_monitor(logFile):
 
 if __name__=='__main__':
 
-	log_monitor(logFile1)
+	# log_monitor(logFile1)
+	logFile = '/var/log/syslog'
+	popen=subprocess.Popen('tail -f'+logFile,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
+	lines = popen.stdout.readline()
+	print(lines)
+	# for line in lines:
+	# 	print(line)

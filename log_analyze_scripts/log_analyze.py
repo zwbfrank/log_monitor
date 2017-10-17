@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import re
 import send_mail as sm
-from database_conn import get_log_path
+# from database_conn import get_log_path_data
 
 # 匹配模式
 
@@ -12,7 +12,7 @@ pattern_warning = re.compile(pattern_warning)
 
 
 # 获取服务器日志路径
-log_path = get_log_path()
+# data = get_log_path_data()
 
 # 读取日志文件存入list或dict以便分析
 # def get_log_lists(log_path):
@@ -49,6 +49,7 @@ class LogAnalyze():
 
 	def __init__(self,log_path):
 		self.log_path = log_path
+		self.warning_log_lists = []
 
 	def get_log_lists(self):
 		try:
@@ -69,8 +70,9 @@ class LogAnalyze():
 				# 警告信息匹配模式
 				elif re.match(pattern_warning,log_list):
 					# sm.send_email(log_list)
+					self.warning_log_lists.append(log_list)
 					self.level = 'WARNING'
-					return log_list
+					# return log_list
 
 
 
@@ -83,8 +85,16 @@ if __name__ == '__main__':
 	# sm.send_email('hello')
 
 
+	# la = LogAnalyze(log_path)
+	# log_list = la.log_analyze()
+	# level = la.level
+	# print(level)
+	# print(log_list)
+	# print('ok')
+	log_path = '/var/log/syslog'
 	la = LogAnalyze(log_path)
-	log_list = la.log_analyze()
-	level = la.level
-	print(level)
-	print(log_list)
+	la.log_analyze()
+	warn_list = la.warning_log_lists
+	print(warn_list)
+	# print(log_lists)
+

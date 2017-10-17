@@ -17,20 +17,16 @@ def pymysql_conn():
 	conn = pymysql.connect(**config)
 	# cursor = conn.cursor()
 	return conn
-	
 
-def get_log_path():
+def get_log_path_data():
 	conn = pymysql_conn()
 	cursor = conn.cursor()
 	sql = 'select *from log_analyze_logmonitor'
 	cursor.execute(sql)
 	data = cursor.fetchall()
-	log_path = data[0][2]
 	cursor.close()
 	conn.close()
-	# conn.close()
-	return log_path
-
+	return data
 # class DataConn():
 # 	"""
 # 		database connection about pymysql.
@@ -42,19 +38,31 @@ def get_log_path():
 if __name__ == '__main__':
 
 
-	log_path = get_log_path()
+	data = get_log_path_data()
+	print(data)
+	log_path = data[0][2]
+	log_type = data[0][1]	
+	# get_log_type()
+	# log_type = get_log_type()
+	# print(log_type)
 	la = lan.LogAnalyze(log_path)
-	
-	content = la.log_analyze()
-	log_level = la.level
-	conn = pymysql_conn()
-	cursor = conn.cursor()
+	la.log_analyze()
+	# print(la.warning_log_lists)
+	for log_list in la.warning_log_lists:
+		# print('ok')
 
-	cursor.execute("insert into log_analyze_logdata (id,log_type,log_level,content) values (%s,%s,%s,%s)",
-					['2','PAYLOG',log_level,content])
-	conn.commit()
-	cursor.close()
-	conn.close()
+		# la.warning_log_lists
+	
+		content = log_list
+		log_level = la.level
+		conn = pymysql_conn()
+		cursor = conn.cursor()
+
+		cursor.execute("insert into log_analyze_logdata (log_type,log_level,content) values (%s,%s,%s)",
+						[log_type,log_level,content])
+		conn.commit()
+		cursor.close()
+		conn.close()
 
 
 
