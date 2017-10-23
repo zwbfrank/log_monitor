@@ -15,7 +15,8 @@ class LogMonitor(models.Model):
 	def __str__(self):
 		return self.log_type
 
-class UserLog(models.Model):
+
+class UserLogSystem(models.Model):
 	# log_type = models.ForeignKey(LogMonitor,on_delete=models.CASCADE)
 	log_type = models.CharField(max_length=225)
 	log_level = models.CharField(max_length=225)
@@ -23,5 +24,38 @@ class UserLog(models.Model):
 
 	def __str__(self):
 		return self.content
-		
 
+
+class UserLogWarning(models.Model):
+	log_type = models.CharField(max_length=225)
+	log_level = models.CharField(max_length=225)
+	content = models.TextField()
+
+	def __str__(self):
+		return self.content
+
+
+class UserLogError(models.Model):
+	log_type = models.CharField(max_length=225)
+	log_level = models.CharField(max_length=225)
+	content = models.TextField()
+
+	def	__str__(self):
+		return self.content
+
+
+class UserLogInfo(models.Model):
+	log_type = models.CharField(max_length=225)
+	log_level = models.CharField(max_length=225)
+	content = models.TextField()
+
+	def __str__(self):
+		return self.content
+
+
+class LogLevel(models.Model):
+	level = models.CharField(max_length=225)
+	desc = models.CharField(max_length=225)
+
+	def __str__(self):
+		return self.level
