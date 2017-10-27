@@ -12,6 +12,7 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import parseaddr,formataddr
 import pymysql
+import sys
 
 
 # 匹配模式
@@ -35,7 +36,11 @@ def pymysql_conn():
         'port': 3306,
         'charset': 'utf8',
     }
-    conn = pymysql.connect(**config)
+    try:
+        conn = pymysql.connect(**config)
+    except:
+        print("Cannot connect into database.")
+    
     # cursor = conn.cursor()
     return conn
 
@@ -48,18 +53,6 @@ def get_log_path_data():
     cursor.close()
     conn.close()
     return data
-# class DataConn():
-#   """
-#       database connection about pymysql.
-#   """
-
-#   def __init__(self,):
-#       pass
-
-#!/usr/bin/env python
-
-# from database_conn import get_log_path_data
-
 
 
 
@@ -141,108 +134,130 @@ class LogAnalyze():
             
 
 
-log_file = '/var/log/testlog'
+log_file = '/var/log/syslog'
 #日志文件一般是按天产生，则通过在程序中判断文件的产生日期与当前时间，更换监控的日志文件  
+
+stoptime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()+10))
+print(stoptime)
 
 def log_monitor(log_file):
     print("监控的日志文件是 %s"%log_file)
     # 程序运行10秒，监控另一个日志
-    stoptime=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()+10))
+
     # 程序监控使用是linux命令tail -f来动态监控新追加的日志
-    popen=subprocess.Popen('tail -f '+log_file,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
+    popen=subprocess.Popen('tail -F '+log_file,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
     pid=popen.pid
     print('Popen.pid:'+str(pid))
     while True:
-        lines=popen.stdout.readlines()
+        line=popen.stdout.readline().strip()
         # current_time=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
         # print(current_time)
     # 判断内容是否为空
-        if lines:
-            print(lines)
+        if line:
+            line = line.decode()
+            print(line)
             # 当前时间
             current_time=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
             print(current_time)
-
-            if current_time>=stoptime:
+            if current_time >= stoptime:
                 # 终止子进程
-                popen.kill()
-                print('杀死subprocess')
-                break
+                popen.terminate()
+                if subprocess.Popen.poll(popen) is not None:
+                    break
+                else:
+                    print("wait for child process")
+    print("done")
                 # time.sleep(2)
                 # log_monitor(logFile2)
 
-
-
-
-    #!/usr/bin/env python
-
-
-
-#邮件地址
-def _fromat_addr(s):
-    name,addr = parseaddr(s)
-    return formataddr((Header(name,'utf-8').encode(),addr))
-
-
-def send_email(message):
-
-    from_addr = '18340865495@163.com'   #发件人邮箱地址
-    password = 'zwbzwy125126'           #口令
-    to_addr = '874032981@qq.com'        #收件人地址
-    smtp_server = 'smtp.163.com'        #smtp协议地址
-
-    msg = MIMEText(message,'plain','UTF-8')   #邮件文本对象
-    msg['Subject'] = Header('Email test','utf-8').encode()
-    msg['From'] = _fromat_addr('Pythoner<%s>'%from_addr)
-    msg['To'] = _fromat_addr('管理员<%s>'%to_addr)
-
-    try:
-        server = smtplib.SMTP(smtp_server,25)   #连接smtp服务器
-        server.login(from_addr,password)    #登录
-        server.sendmail(from_addr,[to_addr],msg.as_string())
-        server.quit()
-    except :
-        pass
-
-
 if __name__ == '__main__':
 
+    testlog = '/root/test2'
+    # with open(testlog) as f:
+    #     loglists = f.readlines()
+    #     mark = f.tell()
+
+
+    # log_monitor(log_file)
+    # starttime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()+10))
+    # print(starttime)
+    # popen = subprocess.Popen('tail -f '+log_file,stdout=subprocess.PIPE,stderr=subprocess.PIPE,stdin=subprocess.PIPE,shell=True)
+    # pid=popen.pid
+    # print(str(pid))
+    # print(starttime)
+    # outputs = popen.stdout.readlines()
+    # for output in outputs:
+    #     print(output.decode())
+    # time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+    # print(time)
 
 
 
-    # data = get_log_path_data()
-    # print(data)
-    # log_path = data[0][2]
-    # log_type = data[0][1]
-    #
-    # la = LogAnalyze(log_path)
-    # la.log_analyze()
-    # # print(la.warning_log_lists)
-    # for log_list in la.error_log_lists:
-    #     content = log_list
-    #     if re.match(pattern_error,content):
-    #         log_level = 'ERROR'
-    #     conn = pymysql_conn()
-    #     cursor = conn.cursor()
-    #
-    #     cursor.execute("insert into log_analyze_userlogerror (log_type,log_level,content) values (%s,%s,%s)",
-    #                     [log_type,log_level,content])
-    #     conn.commit()
-    #     cursor.close()
-    #     conn.close()
-    #
-    # for log_list in la.warning_log_lists:
-    #     content = log_list
-    #     if re.match(pattern_warning,content):
-    #         log_level = 'WARNING'
-    #     conn = pymysql_conn()
-    #     cursor = conn.cursor()
-    #
-    #     cursor.execute("insert into log_analyze_userlogwarning (log_type,log_level,content) values (%s,%s,%s)",
-    #                     [log_type,log_level,content])
-    #     conn.commit()
-    #     cursor.close()
-    #     conn.close()
+# #邮件地址
+# def _fromat_addr(s):
+#     name,addr = parseaddr(s)
+#     return formataddr((Header(name,'utf-8').encode(),addr))
+#
+#
+# def send_email(message):
+#
+#     from_addr = '18340865495@163.com'   #发件人邮箱地址
+#     password = 'zwbzwy125126'           #口令
+#     to_addr = '874032981@qq.com'        #收件人地址
+#     smtp_server = 'smtp.163.com'        #smtp协议地址
+#
+#     msg = MIMEText(message,'plain','UTF-8')   #邮件文本对象
+#     msg['Subject'] = Header('Email test','utf-8').encode()
+#     msg['From'] = _fromat_addr('Pythoner<%s>'%from_addr)
+#     msg['To'] = _fromat_addr('管理员<%s>'%to_addr)
+#
+#     try:
+#         server = smtplib.SMTP(smtp_server,25)   #连接smtp服务器
+#         server.login(from_addr,password)    #登录
+#         server.sendmail(from_addr,[to_addr],msg.as_string())
+#         server.quit()
+#     except :
+#         pass
+#
+#
+# if __name__ == '__main__':
+#
+#
+#
+#
+#     data = get_log_path_data()
+#     print(data)
+#     log_path = data[0][2]
+#     log_type = data[0][1]
+#
+#     la = LogAnalyze(log_path)
+#     la.log_analyze()
+#     # print(la.warning_log_lists)
+#     for log_list in la.error_log_lists:
+#         content = log_list
+#         if re.match(pattern_error,content):
+#             log_level = 'ERROR'
+#         conn = pymysql_conn()
+#         cursor = conn.cursor()
+#
+#         cursor.execute("insert into log_analyze_userlogerror (log_type,log_level,content) values (%s,%s,%s)",
+#                         [log_type,log_level,content])
+#         conn.commit()
+#         cursor.close()
+#         conn.close()
+#
+#     for log_list in la.warning_log_lists:
+#         content = log_list
+#         if re.match(pattern_warning,content):
+#             log_level = 'WARNING'
+#         conn = pymysql_conn()
+#         cursor = conn.cursor()
+#
+#         cursor.execute("insert into log_analyze_userlogwarning (log_type,log_level,content) values (%s,%s,%s)",
+#                         [log_type,log_level,content])
+#         conn.commit()
+#         cursor.close()
+#         conn.close()
 
 
 
