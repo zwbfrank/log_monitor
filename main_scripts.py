@@ -193,133 +193,130 @@ if __name__ == '__main__':
 
 
 
-# #邮件地址
-# def _fromat_addr(s):
-#     name,addr = parseaddr(s)
-#     return formataddr((Header(name,'utf-8').encode(),addr))
-#
-#
-# def send_email(message):
-#
-#     from_addr = '18340865495@163.com'   #发件人邮箱地址
-#     password = 'zwbzwy125126'           #口令
-#     to_addr = '874032981@qq.com'        #收件人地址
-#     smtp_server = 'smtp.163.com'        #smtp协议地址
-#
-#     msg = MIMEText(message,'plain','UTF-8')   #邮件文本对象
-#     msg['Subject'] = Header('Email test','utf-8').encode()
-#     msg['From'] = _fromat_addr('Pythoner<%s>'%from_addr)
-#     msg['To'] = _fromat_addr('管理员<%s>'%to_addr)
-#
-#     try:
-#         server = smtplib.SMTP(smtp_server,25)   #连接smtp服务器
-#         server.login(from_addr,password)    #登录
-#         server.sendmail(from_addr,[to_addr],msg.as_string())
-#         server.quit()
-#     except :
-#         pass
-#
-#
-# if __name__ == '__main__':
-#
-#
-#
-#
-#     data = get_log_path_data()
-#     print(data)
-#     log_path = data[0][2]
-#     log_type = data[0][1]
-#
-#     la = LogAnalyze(log_path)
-#     la.log_analyze()
-#     # print(la.warning_log_lists)
-#     for log_list in la.error_log_lists:
-#         content = log_list
-#         if re.match(pattern_error,content):
-#             log_level = 'ERROR'
-#         conn = pymysql_conn()
-#         cursor = conn.cursor()
-#
-#         cursor.execute("insert into log_analyze_userlogerror (log_type,log_level,content) values (%s,%s,%s)",
-#                         [log_type,log_level,content])
-#         conn.commit()
-#         cursor.close()
-#         conn.close()
-#
-#     for log_list in la.warning_log_lists:
-#         content = log_list
-#         if re.match(pattern_warning,content):
-#             log_level = 'WARNING'
-#         conn = pymysql_conn()
-#         cursor = conn.cursor()
-#
-#         cursor.execute("insert into log_analyze_userlogwarning (log_type,log_level,content) values (%s,%s,%s)",
-#                         [log_type,log_level,content])
-#         conn.commit()
-#         cursor.close()
-#         conn.close()
+#邮件地址
+def _fromat_addr(s):
+    name,addr = parseaddr(s)
+    return formataddr((Header(name,'utf-8').encode(),addr))
+
+
+def send_email(message):
+
+    from_addr = '18340865495@163.com'   #发件人邮箱地址
+    password = 'zwbzwy125126'           #口令
+    to_addr = '874032981@qq.com'        #收件人地址
+    smtp_server = 'smtp.163.com'        #smtp协议地址
+
+    msg = MIMEText(message,'plain','UTF-8')   #邮件文本对象
+    msg['Subject'] = Header('Email test','utf-8').encode()
+    msg['From'] = _fromat_addr('Pythoner<%s>'%from_addr)
+    msg['To'] = _fromat_addr('管理员<%s>'%to_addr)
+
+    try:
+        server = smtplib.SMTP(smtp_server,25)   #连接smtp服务器
+        server.login(from_addr,password)    #登录
+        server.sendmail(from_addr,[to_addr],msg.as_string())
+        server.quit()
+    except :
+        pass
+
+
+if __name__ == '__main__':
 
 
 
-    # def decode(s):
-    #   return ''.join([chr(i) for i in [int(b,2) for b in s.split(' ')]])
 
-    # log_monitor(logFile)
+    data = get_log_path_data()
+    print(data)
+    log_path = data[0][2]
+    log_type = data[0][1]
+
+    la = LogAnalyze(log_path)
+    la.log_analyze()
+    # print(la.warning_log_lists)
+    for log_list in la.error_log_lists:
+        content = log_list
+        if re.match(pattern_error,content):
+            log_level = 'ERROR'
+        conn = pymysql_conn()
+        cursor = conn.cursor()
+
+        cursor.execute("insert into log_analyze_userlogerror (log_type,log_level,content) values (%s,%s,%s)",
+                        [log_type,log_level,content])
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    for log_list in la.warning_log_lists:
+        content = log_list
+        if re.match(pattern_warning,content):
+            log_level = 'WARNING'
+        conn = pymysql_conn()
+        cursor = conn.cursor()
+
+        cursor.execute("insert into log_analyze_userlogwarning (log_type,log_level,content) values (%s,%s,%s)",
+                        [log_type,log_level,content])
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+
+
+    log_monitor(logFile)
     
-    # popen=subprocess.Popen('tail -f '+logfile,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
-    # lines = popen.stdout.readlines()
-    # for line in lines:
-    #   line = type(line)
-    #   print(line)
-    # for line in lines:
-    #   print(line)
-    # logfile='access.log'
-    # starttime=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    # command='tail -f '+logFile
-    # popen=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
-    # # while True:
-    # # lines=popen.stdout.readlines()
-    # current_time=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    # print(stoptime)
-    # print(current_time)
-    # if current_time>=stoptime:
-    #   popen.kill()
-    # for line in lines:
-    #   line = line.decode()
-    # for line in lines:
-    # lines = lines.decode()
-    # print(lines)
-    # popen.kill()
+    popen=subprocess.Popen('tail -f '+logfile,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
+    lines = popen.stdout.readlines()
+    for line in lines:
+      line = type(line)
+      print(line)
+    for line in lines:
+      print(line)
+    logfile='access.log'
+    starttime=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+    command='tail -f '+logFile
+    popen=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
+    # while True:
+    # lines=popen.stdout.readlines()
+    current_time=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+    print(stoptime)
+    print(current_time)
+    if current_time>=stoptime:
+      popen.kill()
+    for line in lines:
+      line = line.decode()
+    for line in lines:
+    lines = lines.decode()
+    print(lines)
+    popen.kill()
 
-    # for line in line:
-    #   line = type(line)
-    #   print(line)
-    # s = decode(line)
-    # print(s)
-    # print(line)
-    # t = type(line)
-    # print(t)
-    # def encode(s):
- #      return ' '.join([bin(ord(c)).replace('0b', '') for c in s])
+    for line in line:
+      line = type(line)
+      print(line)
+    s = decode(line)
+    print(s)
+    print(line)
+    t = type(line)
+    print(t)
+    def encode(s):
+      return ' '.join([bin(ord(c)).replace('0b', '') for c in s])
 
-    # def decode(s):
- #      return ''.join([chr(i) for i in [int(b, 2) for b in s.split(' ')]])
-
-
-    # sm.send_email('hello')
+    def decode(s):
+      return ''.join([chr(i) for i in [int(b, 2) for b in s.split(' ')]])
 
 
-    # la = LogAnalyze(log_path)
-    # log_list = la.log_analyze()
-    # level = la.level
-    # print(level)
-    # print(log_list)
-    # print('ok')
+    sm.send_email('hello')
 
 
-    # log_path = '/var/log/testlog'
-    # la = LogAnalyze(log_path)
-    # la.log_analyze()
-    # warn_list = la.error_log_lists
-    # print(warn_list)
-    # print(log_lists)
+    la = LogAnalyze(log_path)
+    log_list = la.log_analyze()
+    level = la.level
+    print(level)
+    print(log_list)
+    print('ok')
+
+
+    log_path = '/var/log/testlog'
+    la = LogAnalyze(log_path)
+    la.log_analyze()
+    warn_list = la.error_log_lists
+    print(warn_list)
+    print(log_list)

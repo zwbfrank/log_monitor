@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+.idea/
 __pycache__/
 lm_env/
 *.sqlite3
