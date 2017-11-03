@@ -37,9 +37,14 @@ def search_new_file(dirname):
     
     if last_file not in local_newest_files:
         local_newest_files.append(last_file)
-        # new_file_path = os.path.join(directory,last_file)
+        new_file_path = os.path.join(directory,last_file)
         print(last_file)
-        return last_file
+        # return last_file
+        return new_file_path
+    
+def log_analyze():
+    new_file_path = search_new_file()
+    
 
 
 # search_newfile('/var/log')

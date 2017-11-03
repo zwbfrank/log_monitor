@@ -31,7 +31,7 @@ def get_ssh_newest_file():
         # print(ssh_newest_files)
         if line not in ssh_newest_files:
             ssh_newest_files.append(line)
-            print(line)
+            # print(line)
     # print(ssh_newest_files)
     ssh.close()
 
@@ -62,11 +62,13 @@ def tail_ssh_newest_file():
     #     line = output[i].strip()
     #     print(line)
     
+# def ssh_log_analyze():
+    
 
 
 if __name__ == '__main__':
     
-    timing_task(get_ssh_newest_file)
+    timing_task(get_ssh_newest_file,second=5)
     # ssh_newest_files = get_ssh_newest_file()
     # print(ssh_newest_files)
     # tail_ssh_newest_file()
