@@ -99,10 +99,12 @@ def work():
 
 if __name__ == '__main__':
 
-    # search_new_file('/var/log')
-    dirname = '/var/log'
-    # timing_task(search_new_file,dirname,second=45)
-    timing_task(search_new_file,dirname,second=5)
-    # timing_task(work,second=5)
-    # print(local_newest_files)
+    # # search_new_file('/var/log')
+    # dirname = '/var/log'
+    # # timing_task(search_new_file,dirname,second=45)
+    # timing_task(search_new_file,dirname,second=5)
+    # # timing_task(work,second=5)
+    # # print(local_newest_files)
     
+    
+

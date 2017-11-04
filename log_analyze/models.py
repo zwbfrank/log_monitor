@@ -199,5 +199,15 @@ class WxServiceError(models.Model):
         return self.content
 
 
+class SshConfig(models.Model):
+    hostname = models.CharField(max_length=225)
+    port = models.IntegerField()
+    username = models.CharField(max_length=225)
+    password = models.CharField(max_length=225)
+
+    def __str__(self):
+        return self.hostname
+
+
 
 

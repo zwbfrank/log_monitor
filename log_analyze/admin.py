@@ -19,6 +19,7 @@ from .models import ShopServiceError
 from .models import UserServiceError
 from .models import WapWebError
 from .models import WxServiceError
+from .models import SshConfig
 
 # Register your models here.
 # class LogMonitorAdmin(admin.ModelAdmin):
@@ -43,6 +44,8 @@ admin.site.register(ShopServiceError)
 admin.site.register(UserServiceError)
 admin.site.register(WapWebError)
 admin.site.register(WxServiceError)
+admin.site.register(SshConfig)
+
 
 admin.site.site_header = "Peanut Plan Admin"
 admin.site.site_title = "Peanut Plan Admin"

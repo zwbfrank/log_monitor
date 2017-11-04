@@ -2,7 +2,7 @@ from subprocess import Popen,PIPE
 import time
 import multiprocessing
 import os
-from tail_file import timing_task
+# from tail_file import timing_task
 
 # def func(msg):
 #     for i in range(4):
@@ -12,14 +12,29 @@ from tail_file import timing_task
 #     return "done " + msg
 
 if __name__ == "__main__":
-	file = '/var/log/newfile0'
-	# file_path = unicode(file,'utf8')
-	fsize = os.path.getsize(file)
-	print(fsize)
-	with open(file) as f:
-		line = f.read()
-		offset = f.tell()
-		print(offset)
+	try:
+		with open('sdf.txt') as f:
+			data = f.read()
+			print(data)
+	except FileNotFoundError as e:
+		print(e)
+	else:
+		pass
+
+
+
+
+	
+	# fsize = os.path.getsize(file)
+	# fsize_type = type(fsize)
+	# print(fsize)
+	# print(fsize_type)
+	# with open(file) as f:
+	# 	line = f.read()
+	# 	offset = f.tell()
+	# 	size = f.getsize()
+	# 	print("size:",size)
+	# 	print(offset)
 
 
 

@@ -1,6 +1,6 @@
 python3.5.2
 django==1.11.6
 pymysql==0.7.11
-django-suit==v2
+django-suit==v2  pip install https://github.com/darklow/django-suit/tarball/v2
 paramiko==2.3.1
 pycrypto==2.6.1

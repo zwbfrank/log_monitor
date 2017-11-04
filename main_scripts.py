@@ -24,8 +24,10 @@ from global_variable import local_newest_files,ssh_newest_files,log_type,log_pat
 # 匹配模式
 pattern_error   = r'.*\[ERROR\].*'
 pattern_warning = r'.*WARNING.*'
-pattern_info    = r'.*<info>'
+pattern_info    = r'.*(info\.log)$'
 pattern_system  = r'.*\[system\].*'
+pattern_admin   = r'^[Nov\s]+'
+pattern_admin   = re.compile(pattern_admin)
 pattern_error   = re.compile(pattern_error)
 pattern_warning = re.compile(pattern_warning)
 pattern_info    = re.compile(pattern_info)
@@ -60,39 +62,7 @@ def get_log_path_data():
     conn.close()
     return data
 
-# def ssh_log_analyze():
-
-# 获取服务器日志路径
-# data = get_log_path_data()
-
-# 读取日志文件存入list或dict以便分析
-# def get_log_lists(log_path):
-
-#   try:
-#       with open(log_path,'r',errors='ignore') as f_obj:
-#           log_lists = f_obj.readlines()
-#   except FileNotFoundError:
-#       pass
-#   else:
-#       return log_lists
-
-
-# 分析日志
-# def analysis_log(log_lists): 
-
-#   for log_list in log_lists:
-#       if log_list:
-#           # 日志错误信息匹配模式
-#           if re.match(pattern_error,log_list):
-#               pass
-#           # 警告信息匹配模式
-#           elif re.match(pattern_warning,log_list):
-#               # sm.send_email(log_list)
-#               print("hello")
-        # else:
-        #   return
-        #   pass
-        
+    
 class LogAnalyze():
 
     """
@@ -139,14 +109,10 @@ class LogAnalyze():
                     # self.level = 'SYSTEM'
             
 
-
-
-
 #邮件地址
-def _fromat_addr(s):
+def fromat_addr(s):
     name,addr = parseaddr(s)
     return formataddr((Header(name,'utf-8').encode(),addr))
-
 
 def send_email(message):
 
@@ -168,7 +134,6 @@ def send_email(message):
     except :
         pass
 
-
 def ssh_connect(hostname, port, username, password):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -179,7 +144,7 @@ def ssh_connect(hostname, port, username, password):
         pass
 
 def get_ssh_newest_file():
-    last_file = []
+    # last_file = []
     ssh = ssh_connect('120.27.220.53', 8222, 'hsplan', 'wUrSLSoE%Jaih*sx%M')
     # log_file = "biz-service-info.log"
     # command_cat = "cat /var/log/ppss_biz_service/" + log_file + "|grep ERROR"
@@ -187,15 +152,17 @@ def get_ssh_newest_file():
     stdin, stdout, stderr = ssh.exec_command(command_ls)
     output = stdout.readlines()
     for i in range(len(output)):
-        line = output[i].strip()
-        # print(ssh_newest_files)
-        last_file.append(line)
-        if line not in ssh_newest_files:
-            ssh_newest_files.append(line)
+        newest_file = output[i].strip()
+        if pattern_info.match(newest_file):
+            print(newest_file)
+            ssh.close()
+            return newest_file
+        # last_file.append(line)
+        # if line not in ssh_newest_files:
+        #     ssh_newest_files.append(line)
             # print(line)
     # print(ssh_newest_files)
-    ssh.close()
-    return last_file
+    # return last_file
 
 def cat_ssh_newest_file(directory):
     # directory = "/var/log/ppss_biz_service/"
@@ -219,7 +186,6 @@ def cat_ssh_newest_file(directory):
     conn.close()
     ssh.close()
 
-
 def tail_ssh_newest_file():
     directory = "/var/log/ppss_biz_service/"
     ssh = ssh_connect('120.27.220.53', 8222, 'hsplan', 'wUrSLSoE%Jaih*sx%M')
@@ -230,9 +196,6 @@ def tail_ssh_newest_file():
     while True:
         output = stdout.readline().strip()
         print(output)
-
-
-
 
 def search_new_file(dirname):
     """
@@ -245,11 +208,11 @@ def search_new_file(dirname):
 
     list_file = os.listdir(directory)
     # print(list_file)
-
-    for f in list_file:
-        if os.path.isfile(os.path.join(directory, f)):
-            stat_info = os.stat(os.path.join(directory, f))
-            file_mtime[f] = stat_info.st_mtime
+    if list_file is not None:
+        for f in list_file:
+            if os.path.isfile(os.path.join(directory, f)):
+                stat_info = os.stat(os.path.join(directory, f))
+                file_mtime[f] = stat_info.st_mtime
 
     last_file = max(file_mtime, key=file_mtime.get)
 
@@ -258,10 +221,6 @@ def search_new_file(dirname):
     #     # new_file_path = os.path.join(directory,last_file)
     #     print("newest file is: ",last_file)
     return last_file
-
-# search_newfile('/var/log')
-
-
 
 def read_new_file():
     # errors = []
@@ -273,54 +232,40 @@ def read_new_file():
     log_level = 'COMMON'
     insert = "INSERT INTO log_analyze_adminweberror (log_type,log_level,content) VALUES (%s,%s,%s)"
     last_file = search_new_file(dirname)
+    print("正在监控的文件： ",last_file)
     last_file_path = os.path.join(dirname,last_file)
+    # file_size = os.path.getsize(last_file_path)
     with open(last_file_path) as f:
-        with open('/root/offset.txt') as f_off:
-            # 获取当前文件自上次读取后的偏移量
-            offset = f_off.read().strip()
-
+        try:
+            with open('/root/offset.txt') as f_off:
+                # 获取当前文件自上次读取后的偏移量
+                offset = f_off.read().strip()
+                print("读取后的offset: ",offset)
+                file_size = os.path.getsize(last_file_path)
+                if file_size < int(offset):
+                    offset = 0
+                    print("置为０的offset: ",offset)
+        except FileNotFoundError:
+            offset = 0
+            print("offset文件不存在时的offset: ",offset)
+            
         f.seek(int(offset),0)
         while True:
             line = f.readline().rstrip()
             if not line:
                 break
-            elif re.match(r'^[Nov\s\d]+',line):
+            elif re.match(pattern_admin,line):
                 print(line)
                 cursor.execute(insert,[log_type,log_level,line])
                 conn.commit()
         offset = f.tell()
-
+        
         with open('/root/offset.txt','w') as f_off:
             # 将操作文件后的偏移量以覆盖方式存入文件
             f_off.write(str(offset))
     cursor.close()
     conn.close()
     
-    # try:
-    #     with open(last_file_path) as f:
-    #         with open('root/offset.txt') as f_off:
-    #             offset = f_off.read().strip()
-    #         f.seek(int(offset),0)
-    #
-    #         while True:
-    #             line = f.readline().rstrip()
-    #             if not line:
-    #                 break
-    #             elif re.match(r'^[Nov\s\d]+',line):
-    #                 print(line)
-    #                 cursor.execute(insert,[log_type,log_level,line])
-    #                 conn.commit()
-    #         offset = f.tell()
-    #
-    #         with open('/root/offset.txt','w') as f_off:
-    #             f_off.write(str(offset))
-    # except Exception as e:
-    #     pass
-    # cursor.close()
-    # conn.close()
-    # # return last_file_path
-
-
 def tail_file():
     dirname = '/var/log'
     last_file_path = os.path.join(dirname,search_new_file(dirname))
@@ -347,9 +292,6 @@ def tail_file():
     cursor.close()
     conn.close()
     
-
-
-
 def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0, second=0):
     now_time = datetime.now()
     format_now_time = now_time.strftime('%Y-%m-%d %H:%M:%S')
@@ -366,7 +308,7 @@ def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0,
         now_time = datetime.now()
         format_now_time = now_time.strftime('%Y-%m-%d %H:%M:%S')
         if str(format_now_time) == str(format_next_time):
-            # print("start work: ",format_now_time)
+            print("start work: ",format_now_time)
             start_time = datetime.now()
             if arg is not None:
                 func(arg)
@@ -378,7 +320,7 @@ def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0,
                 func()
             end_time = datetime.now()
             task_time = end_time - start_time
-            # print("task done."+"\n\n")
+            print("task done."+"\n\n")
     
             next_run_time = now_time + timing + task_time
             format_next_time = next_run_time.strftime('%Y-%m-%d %H:%M:%S')
@@ -387,14 +329,11 @@ def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0,
 def ssh_analyze_log():
     last_file = get_ssh_newest_file()
 
-
 def main():
     last_file = get_ssh_newest_file()
     data = get_log_path_data()
     log_path = data[2][2]
     log_type = data[2][1]
-
-
 
 
 if __name__ == '__main__':
@@ -408,8 +347,10 @@ if __name__ == '__main__':
     # with open('/root/offset.txt', 'w') as offset:
     #     offset.write('0')
     # read_new_file()
-    timing_task(read_new_file,second=30)
+    # timing_task(read_new_file,second=10)
     # timing_task(tail_file,second=30)
+    
+    get_ssh_newest_file()
 
 
     # last_file = get_ssh_newest_file()
@@ -455,6 +396,5 @@ if __name__ == '__main__':
     #     conn.commit()
     #     cursor.close()
     #     conn.close()
-
 
 
