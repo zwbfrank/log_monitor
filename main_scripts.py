@@ -170,7 +170,7 @@ def cat_ssh_newest_file(directory):
     cursor = conn.cursor()
     ssh = ssh_connect('120.27.220.53', 8222, 'hsplan', 'wUrSLSoE%Jaih*sx%M')
     ssh_newest_files = get_ssh_newest_file()
-    log_file = ssh_newest_files.pop()
+    log_file = ssh_newest_files
 
     command_cat = "cat " + directory + log_file + "|grep ERROR"
     sdin, stdout, stderr = ssh.exec_command(command_cat)
@@ -190,11 +190,13 @@ def tail_ssh_newest_file():
     directory = "/var/log/ppss_biz_service/"
     ssh = ssh_connect('120.27.220.53', 8222, 'hsplan', 'wUrSLSoE%Jaih*sx%M')
     ssh_newest_files = get_ssh_newest_file()
-    log_file = ssh_newest_files.pop()
+    log_file = ssh_newest_files
     command_tail = "tail -F " + directory + log_file
     stdin, stdout, stderr = ssh.exec_command(command_tail)
     while True:
         output = stdout.readline().strip()
+        if not output:
+            continue
         print(output)
 
 def search_new_file(dirname):
@@ -350,8 +352,8 @@ if __name__ == '__main__':
     # timing_task(read_new_file,second=10)
     # timing_task(tail_file,second=30)
     
-    get_ssh_newest_file()
-
+    # get_ssh_newest_file()
+    tail_ssh_newest_file()
 
     # last_file = get_ssh_newest_file()
     # data = get_log_path_data()
