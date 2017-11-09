@@ -18,7 +18,7 @@ import sys
 from threading import Timer,Thread
 from multiprocessing import Process, Queue
 from datetime import time, datetime, timedelta
-from global_variable import local_newest_files,ssh_newest_files,log_type,log_path
+# from global_variable import local_newest_files,ssh_newest_file,log_type,log_path
 
 
 # 匹配模式
@@ -26,7 +26,7 @@ pattern_error   = r'.*\[ERROR\].*'
 pattern_warning = r'.*WARNING.*'
 pattern_info    = r'.*(info\.log)$'
 pattern_system  = r'.*\[system\].*'
-pattern_admin   = r'^[Nov\s]+'
+pattern_admin   = r'^Nov\s+(\d{1,2}).*'
 pattern_admin   = re.compile(pattern_admin)
 pattern_error   = re.compile(pattern_error)
 pattern_warning = re.compile(pattern_warning)
@@ -123,8 +123,8 @@ def send_email(message):
 
     msg = MIMEText(message,'plain','UTF-8')   #邮件文本对象
     msg['Subject'] = Header('Email test','utf-8').encode()
-    msg['From'] = _fromat_addr('Pythoner<%s>'%from_addr)
-    msg['To'] = _fromat_addr('管理员<%s>'%to_addr)
+    msg['From'] = fromat_addr('Pythoner<%s>'%from_addr)
+    msg['To'] = fromat_addr('管理员<%s>'%to_addr)
 
     try:
         server = smtplib.SMTP(smtp_server,25)   #连接smtp服务器
@@ -158,10 +158,10 @@ def get_ssh_newest_file():
             ssh.close()
             return newest_file
         # last_file.append(line)
-        # if line not in ssh_newest_files:
-        #     ssh_newest_files.append(line)
+        # if line not in ssh_newest_file:
+        #     ssh_newest_file.append(line)
             # print(line)
-    # print(ssh_newest_files)
+    # print(ssh_newest_file)
     # return last_file
 
 def cat_ssh_newest_file(directory):
@@ -169,8 +169,8 @@ def cat_ssh_newest_file(directory):
     conn = pymysql_conn()
     cursor = conn.cursor()
     ssh = ssh_connect('120.27.220.53', 8222, 'hsplan', 'wUrSLSoE%Jaih*sx%M')
-    ssh_newest_files = get_ssh_newest_file()
-    log_file = ssh_newest_files
+    ssh_newest_file = get_ssh_newest_file()
+    log_file = ssh_newest_file
 
     command_cat = "cat " + directory + log_file + "|grep ERROR"
     sdin, stdout, stderr = ssh.exec_command(command_cat)
@@ -186,11 +186,46 @@ def cat_ssh_newest_file(directory):
     conn.close()
     ssh.close()
 
+def read_ssh_newest_file():
+    directory = "/var/log/ppss_biz_service/"
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    ssh = ssh_connect('120.27.220.53', 8222, 'hsplan', 'wUrSLSoE%Jaih*sx%M')
+    try:
+        while True:
+            ssh_newest_file = get_ssh_newest_file()
+            if not ssh_newest_file:
+                continue
+            command_cat = "cat " + directory + ssh_newest_file + "|grep ERROR"
+            sdin, stdout, stderr = ssh.exec_command(command_cat)
+            log_type = 'BIZ'
+            log_level = 'ERROR'
+            lines = stdout.readlines()
+            for i in range(len(lines)):
+                line = lines[i].strip()
+                if line:
+                    print(line)
+                    cursor.execute("INSERT INTO log_analyze_bizserviceerror (log_type,log_level,content) VALUES (%s,%s,%s)",
+                                    [log_type,log_level,line])
+                    conn.commit()
+            command_tail = "tail -F " + directory + ssh_newest_file+"|grep ERROR"
+            stdin, stdout, stderr = ssh.exec_command(command_tail)
+            while True:
+                line = stdout.readline().strip()
+                if not line:
+                    continue
+                print(line)
+    except Exception as e:
+        print(e)
+        cursor.close()
+        conn.close()
+        ssh.close()
+
 def tail_ssh_newest_file():
     directory = "/var/log/ppss_biz_service/"
     ssh = ssh_connect('120.27.220.53', 8222, 'hsplan', 'wUrSLSoE%Jaih*sx%M')
-    ssh_newest_files = get_ssh_newest_file()
-    log_file = ssh_newest_files
+    ssh_newest_file = get_ssh_newest_file()
+    log_file = ssh_newest_file
     command_tail = "tail -F " + directory + log_file
     stdin, stdout, stderr = ssh.exec_command(command_tail)
     while True:
@@ -328,75 +363,14 @@ def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0,
             format_next_time = next_run_time.strftime('%Y-%m-%d %H:%M:%S')
             continue
             
-def ssh_analyze_log():
-    last_file = get_ssh_newest_file()
-
-def main():
-    last_file = get_ssh_newest_file()
-    data = get_log_path_data()
-    log_path = data[2][2]
-    log_type = data[2][1]
 
 
 if __name__ == '__main__':
     
-    # threads = []
-    # t1 = Thread(target=timing_task,args=(read_new_file,second=30))
-    # dirname = '/var/log/'
-    # timing_task(search_new_file,dirname,second=5)
-    
-    
-    # with open('/root/offset.txt', 'w') as offset:
-    #     offset.write('0')
-    # read_new_file()
-    # timing_task(read_new_file,second=10)
-    # timing_task(tail_file,second=30)
-    
-    # get_ssh_newest_file()
-    tail_ssh_newest_file()
-
-    # last_file = get_ssh_newest_file()
-    # data = get_log_path_data()
-    # log_path = data[2][2]
-    # log_type = data[2][1]
-    # cat_ssh_newest_file(log_path)
-    # timing_task(cat_ssh_newest_file,log_path,second=10)
+    timing_task(read_new_file,second=30)
+    # read_ssh_newest_file()
 
 
-    # data = get_log_path_data()
-    # print(data)
-    # log_path = data[0][2]
-    # log_type = data[0][1]
 
-
-    # la = LogAnalyze(log_path)
-    # la.log_analyze()
-    # # print(la.warning_log_lists)
-    # for log_list in la.error_log_lists:
-    #     content = log_list
-    #     if re.match(pattern_error,content):
-    #         log_level = 'ERROR'
-    #     conn = pymysql_conn()
-    #     cursor = conn.cursor()
-
-    #     cursor.execute("insert into log_analyze_userlogerror (log_type,log_level,content) values (%s,%s,%s)",
-    #                     [log_type,log_level,content])
-    #     conn.commit()
-    #     cursor.close()
-    #     conn.close()
-
-
-    # for log_list in la.warning_log_lists:
-    #     content = log_list
-    #     if re.match(pattern_warning,content):
-    #         log_level = 'WARNING'
-    #     conn = pymysql_conn()
-    #     cursor = conn.cursor()
-
-    #     cursor.execute("insert into log_analyze_userlogwarning (log_type,log_level,content) values (%s,%s,%s)",
-    #                     [log_type,log_level,content])
-    #     conn.commit()
-    #     cursor.close()
-    #     conn.close()
 
 
