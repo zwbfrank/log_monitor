@@ -274,7 +274,7 @@ def read_new_file():
     # file_size = os.path.getsize(last_file_path)
     with open(last_file_path) as f:
         try:
-            with open('/root/offset.txt') as f_off:
+            with open('./offset.txt') as f_off:
                 # 获取当前文件自上次读取后的偏移量
                 offset = f_off.read().strip()
                 print("读取后的offset: ",offset)
@@ -297,7 +297,7 @@ def read_new_file():
                 conn.commit()
         offset = f.tell()
         
-        with open('/root/offset.txt','w') as f_off:
+        with open('./offset.txt','w') as f_off:
             # 将操作文件后的偏移量以覆盖方式存入文件
             f_off.write(str(offset))
     cursor.close()
@@ -312,7 +312,7 @@ def tail_file():
     log_level = 'COMMON'
     insert = "INSERT INTO log_analyze_adminweberror (log_type,log_level,content) VALUES (%s,%s,%s)"
     with open(last_file_path) as f:
-        with open('/root/offset.txt') as f_off:
+        with open('./offset.txt') as f_off:
             offset = f_off.read().strip()
 
         f.seek(int(offset),0)
@@ -324,7 +324,7 @@ def tail_file():
             conn.commit()
         offset = f.tell()
 
-        with open('/root/offset.txt','w') as f_off:
+        with open('./offset.txt','w') as f_off:
             f_off.write(str(offset))
     cursor.close()
     conn.close()
