@@ -79,7 +79,7 @@ class BizServiceError(models.Model):
     content = models.TextField()
 
     def __str__(self):
-        return self.content[:225]+'...'
+        return self.content
 
 
 class AdminWebError(models.Model):

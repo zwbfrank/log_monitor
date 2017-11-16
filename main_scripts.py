@@ -16,7 +16,7 @@ import paramiko
 import sys
 
 from threading import Timer,Thread
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue,Pool
 from datetime import time, datetime, timedelta
 # from global_variable import local_newest_files,ssh_newest_file,log_type,log_path
 
@@ -26,7 +26,7 @@ pattern_error   = r'.*\[ERROR\].*'
 pattern_warning = r'.*WARNING.*'
 pattern_info    = r'.*(info\.log)$'
 pattern_system  = r'.*\[system\].*'
-pattern_admin   = r'^Nov\s+(\d{1,2}).*'
+pattern_admin   = r'^Nov\s+(14).*'
 pattern_admin   = re.compile(pattern_admin)
 pattern_error   = re.compile(pattern_error)
 pattern_warning = re.compile(pattern_warning)
@@ -192,31 +192,27 @@ def read_ssh_newest_file():
     cursor = conn.cursor()
     ssh = ssh_connect('120.27.220.53', 8222, 'hsplan', 'wUrSLSoE%Jaih*sx%M')
     try:
-        while True:
-            ssh_newest_file = get_ssh_newest_file()
-            if not ssh_newest_file:
-                continue
-            command_cat = "cat " + directory + ssh_newest_file + "|grep ERROR"
-            sdin, stdout, stderr = ssh.exec_command(command_cat)
-            log_type = 'BIZ'
-            log_level = 'ERROR'
-            lines = stdout.readlines()
-            for i in range(len(lines)):
-                line = lines[i].strip()
-                if line:
-                    print(line)
-                    cursor.execute("INSERT INTO log_analyze_bizserviceerror (log_type,log_level,content) VALUES (%s,%s,%s)",
-                                    [log_type,log_level,line])
-                    conn.commit()
-            command_tail = "tail -F " + directory + ssh_newest_file+"|grep ERROR"
-            stdin, stdout, stderr = ssh.exec_command(command_tail)
-            while True:
-                line = stdout.readline().strip()
-                if not line:
-                    continue
+        ssh_newest_file = get_ssh_newest_file()
+        command_cat = "cat " + directory + ssh_newest_file + "|grep ERROR"
+        sdin, stdout, stderr = ssh.exec_command(command_cat)
+        log_type = 'BIZ'
+        log_level = 'ERROR'
+        lines = stdout.readlines()
+        for i in range(len(lines)):
+            line = lines[i].strip()
+            if line:
                 print(line)
-    except Exception as e:
-        print(e)
+                cursor.execute("INSERT INTO log_analyze_bizserviceerror (log_type,log_level,content) VALUES (%s,%s,%s)",
+                                [log_type,log_level,line])
+                conn.commit()
+        command_tail = "tail -F " + directory + ssh_newest_file+"|grep ERROR"
+        stdin, stdout, stderr = ssh.exec_command(command_tail)
+        while True:
+            line = stdout.readline().strip()
+            if not line:
+                continue
+            print(line)
+    except:
         cursor.close()
         conn.close()
         ssh.close()
@@ -259,32 +255,33 @@ def search_new_file(dirname):
     #     print("newest file is: ",last_file)
     return last_file
 
-def read_new_file():
+def read_new_file(dirname):
     # errors = []
     # global offset
-    dirname = '/var/log/'
+    # dirname = '/var/log/'
     conn = pymysql_conn()
     cursor = conn.cursor()
     log_type = 'SYSTEM'
     log_level = 'COMMON'
-    insert = "INSERT INTO log_analyze_adminweberror (log_type,log_level,content) VALUES (%s,%s,%s)"
+    table = 'bizserviceerror'
+    insert = "INSERT INTO log_analyze_"+table+" (log_type,log_level,content) VALUES (%s,%s,%s)"
     last_file = search_new_file(dirname)
     print("正在监控的文件： ",last_file)
     last_file_path = os.path.join(dirname,last_file)
     # file_size = os.path.getsize(last_file_path)
     with open(last_file_path) as f:
         try:
-            with open('./offset.txt') as f_off:
+            with open(dirname+'offset.txt') as f_off:
                 # 获取当前文件自上次读取后的偏移量
                 offset = f_off.read().strip()
                 print("读取后的offset: ",offset)
                 file_size = os.path.getsize(last_file_path)
                 if file_size < int(offset):
                     offset = 0
-                    print("置为０的offset: ",offset)
+                    print("新文件的offset: ",offset)
         except FileNotFoundError:
             offset = 0
-            print("offset文件不存在时的offset: ",offset)
+            print("offset文件不存在: ",offset)
             
         f.seek(int(offset),0)
         while True:
@@ -297,7 +294,7 @@ def read_new_file():
                 conn.commit()
         offset = f.tell()
         
-        with open('./offset.txt','w') as f_off:
+        with open(dirname+'offset.txt','w') as f_off:
             # 将操作文件后的偏移量以覆盖方式存入文件
             f_off.write(str(offset))
     cursor.close()
@@ -329,7 +326,7 @@ def tail_file():
     cursor.close()
     conn.close()
     
-def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0, second=0):
+def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0, second=10):
     now_time = datetime.now()
     format_now_time = now_time.strftime('%Y-%m-%d %H:%M:%S')
     print("now: ", format_now_time)
@@ -365,12 +362,22 @@ def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0,
             
 
 
-if __name__ == '__main__':
-    
-    timing_task(read_new_file,second=30)
+from log_path import DEFAULT_PATH
+log_path = ['/var/log/','/var/log/nginx/','/etc/','/var/log/mysql/']
+if __name__=='__main__':
+    dirname = '/var/log/ppss_biz_service/'
+    timing_task(read_new_file,dirname)
+    # print('Parent process: ', os.getpid())
+    # p = Pool()
+    # for path in log_path:
+    #     print(path)
+    #     p.apply_async(timing_task, args=(read_new_file,path))
+    # print('Waiting for all subprocesses done...')
+    # p.close()
+    # p.join()
+    # print('All subprocesses done.')
+
+
+
+
     # read_ssh_newest_file()
-
-
-
-
-

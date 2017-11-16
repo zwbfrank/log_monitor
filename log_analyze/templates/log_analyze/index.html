@@ -1,17 +1,31 @@
-<!-- <p>Log Monitor</p>
+{% extends "log_analyze/base_site.html" %}
 
-<form method="post">
-{% csrf_token %}
-{{ form }}
-<input type="submit" value="Submit">	
-</form> -->
+{% block content %}
+<p><a href="{% url 'index' %}"><strong>HsPlan Log Monitor</strong></a></p>
 
-<p>Log BizServiceError</p>
+<p>
+	<li><a href="{% url 'bizerror' %}">biz service error</a></li>
+	<li><a href="">admin web error</a></li>
+	<li><a href="">alibblife web error</a></li>
+	<li><a href="">alilife service error</a></li>
+	<li><a href="">communication service error</a></li>
+	<li><a href="">config service error</a></li>
+	<li><a href="">mobile web error</a></li>
+	<li><a href="">order service error</a></li>
+	<li><a href="">pay service error</a></li>
+	<li><a href="">promotion service error</a></li>
+	<li><a href="">shop service error</a></li>
+	<li><a href="">user service error</a></li>
+	<li><a href="">wap web error</a></li>
+	<li><a href="">wx service error</a></li>
+	<li><a href="">ssh config</a></li>
+</p>
 
-	<ul>
-		{% for log in logs %}
-			<li>{{ log }}</li>
-		{% empty %}
-			<p>sorry,no log has been add</p>
-		{% endfor %}
-	</ul>
+{% endblock %}
+
+
+
+
+
+
+

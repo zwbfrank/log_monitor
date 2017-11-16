@@ -4,8 +4,11 @@ from .models import BizServiceError
 
 # Create your views here.
 def index(request):
+
+	return render(request,'log_analyze/index.html')
+
+def biz_service_error(request):
 	logs = BizServiceError.objects.all()
 	logs = reversed(logs)
 	context = {'logs':logs}
-	return render(request,'log_analyze/index.html',context)
-
+	return render(request,'log_analyze/bizerror.html',context)
