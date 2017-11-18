@@ -1,0 +1,15 @@
+{% extends "log_analyze/base_site.html" %}
+
+{% block content %}
+<p><a href="{% url 'index' %}"><strong>HsPlan Log Monitor</strong>
+<p>ConfigServiceError</p>
+
+	<ul>
+		{% for log in logs %}
+			<li>{{ log }}</li>
+		{% empty %}
+			<p>sorry,no log has been added</p>
+		{% endfor %}
+	</ul>
+
+{% endblock %}
