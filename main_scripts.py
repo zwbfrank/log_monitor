@@ -20,24 +20,67 @@ from multiprocessing import Process, Queue,Pool
 from datetime import time, datetime, timedelta
 # from global_variable import local_newest_files,ssh_newest_file,log_type,log_path
 
+DEFAULT_LOG_PATH = ['/var/log/ppss_biz_service','/var/log/ppss_order_service/','/var/log/ppss_pay_service/',
+                    '/var/log/ppss_shop_service/','/var/log/ppss_wx_service/','/var/log/ppss_user_service/',
+                    '/var/log/ppss_alibblife_web/','/var/log/ppss_alilife_service','/var/log/ppss_admin_web',
+                    '/var/log/ppss_communication_service','/var/log/ppss_mobile_web','/var/log/ppss_config_service',
+                    '/var/log/ppss_promotion_service','/var/log/ppss_wap_web']
+
+dirname_dict = {
+    'biz': '/var/log/ppss_biz_service',
+    'alibblife': '/var/log/ppss_alibblife_web',
+    'admin': '/var/log/ppss_admin_web',
+    'alilife': '/var/log/ppss_alilife_service',
+    'commun': '/var/log/ppss_communication_service',
+    'config': '/var/log/ppss_config_service',
+    'mobile': '/var/log/ppss_mobile_web',
+    'order': '/var/log/ppss_order_service',
+    'pay': '/var/log/ppss_pay_service',
+    'promotion': '/var/log/ppss_promotion_service',
+    'shop': '/var/log/ppss_shop_service',
+    'wap': '/var/log/ppss_wap_web',
+    'wx': '/var/log/ppss_wx_service',
+    'user': '/var/log/ppss_user_service',
+}
+
+
+table_dict = {
+    'biz': 'log_analyze_bizserviceerror',
+    'alibblife': 'log_analyze_alibblifeweberror',
+    'admin': 'log_analyze_adminweberror',
+    'alilife': 'log_analyze_alilifeserviceerror',
+    'commun': 'log_analyze_communicationserviceerror',
+    'config': 'log_analyze_configserviceerror',
+    'mobile': 'log_analyze_mobileweberror',
+    'order': 'log_analyze_orderserviceerror',
+    'pay': 'log_analyze_payserviceerror',
+    'promotion': 'log_analyze_promotionserviceerror',
+    'shop': 'log_analyze_shopserviceerror',
+    'wap': 'log_analyze_wapweberror',
+    'wx': 'log_analyze_wxserviceerror',
+    'user': 'log_analyze_userserviceerror',
+}
+
 
 # 匹配模式
-pattern_error   = r'.*\[ERROR\].*'
-pattern_warning = r'.*WARNING.*'
-pattern_info    = r'.*(info\.log)$'
-pattern_system  = r'.*\[system\].*'
-pattern_admin   = r'^Nov\s+(14).*'
-pattern_admin   = re.compile(pattern_admin)
-pattern_error   = re.compile(pattern_error)
-pattern_warning = re.compile(pattern_warning)
-pattern_info    = re.compile(pattern_info)
-pattern_system  = re.compile(pattern_system)
+pattern_error         = r'.*\[ERROR\].*'
+pattern_warning       = r'.*WARNING.*'
+pattern_info_file     = r'.*(info\.log)$'
+pattern_error_file    = r'.*(error\.log)$'
+pattern_system        = r'.*\[system\].*'
+pattern_admin         = r'^Nov\s+(14).*'
+pattern_admin         = re.compile(pattern_admin)
+pattern_error         = re.compile(pattern_error)
+pattern_warning       = re.compile(pattern_warning)
+pattern_info_file     = re.compile(pattern_info_file)
+pattern_system        = re.compile(pattern_system)
+pattern_error_file    = re.compile(pattern_error_file)
 
 
 def pymysql_conn():
     # databases config
     config = {
-        'db': 'log_DB',
+        'db': 'log_monitor',
         'user': 'root',
         'password': 'password',
         'host': '127.0.0.1',
@@ -63,50 +106,50 @@ def get_log_path_data():
     return data
 
     
-class LogAnalyze():
-
-    """
-        Log analyze.
-    """
-
-    def __init__(self,log_path):
-        self.log_path = log_path
-        self.error_log_lists   = []
-        self.warning_log_lists = []
-        self.info_log_lists    = []
-        self.system_log_lists  = []
-        self.level = ''
-
-    def get_log_lists(self):
-        try:
-            with open(self.log_path,'r',errors='ignore') as f_obj:
-                log_lists = f_obj.readlines()
-        except FileNotFoundError:
-            pass
-        else:
-            return log_lists
-
-    def log_analyze(self):
-        log_lists = self.get_log_lists()
-        for log_list in log_lists:
-            if log_list:
-                # 日志错误信息匹配模式
-                if re.match(pattern_error,log_list):
-                    self.error_log_lists.append(log_list)
-                    # self.level = 'ERROR'
-                # 警告信息匹配模式
-                elif re.match(pattern_warning,log_list):
-                    # send_email(log_list)
-                    self.warning_log_lists.append(log_list)
-                    # self.level = 'WARNING'
-                # info pattern
-                elif re.match(pattern_info,log_list):
-                    self.info_log_lists.append(log_list)
-                    # self.level = 'INFO'
-                # system pattern
-                elif re.match(pattern_system,log_list):
-                    self.system_log_lists.append(log_list)
-                    # self.level = 'SYSTEM'
+# class LogAnalyze():
+#
+#     """
+#         Log analyze.
+#     """
+#
+#     def __init__(self,log_path):
+#         self.log_path = log_path
+#         self.error_log_lists   = []
+#         self.warning_log_lists = []
+#         self.info_log_lists    = []
+#         self.system_log_lists  = []
+#         self.level = ''
+#
+#     def get_log_lists(self):
+#         try:
+#             with open(self.log_path,'r',errors='ignore') as f_obj:
+#                 log_lists = f_obj.readlines()
+#         except FileNotFoundError:
+#             pass
+#         else:
+#             return log_lists
+#
+#     def log_analyze(self):
+#         log_lists = self.get_log_lists()
+#         for log_list in log_lists:
+#             if log_list:
+#                 # 日志错误信息匹配模式
+#                 if re.match(pattern_error,log_list):
+#                     self.error_log_lists.append(log_list)
+#                     # self.level = 'ERROR'
+#                 # 警告信息匹配模式
+#                 elif re.match(pattern_warning,log_list):
+#                     # send_email(log_list)
+#                     self.warning_log_lists.append(log_list)
+#                     # self.level = 'WARNING'
+#                 # info pattern
+#                 elif re.match(pattern_info,log_list):
+#                     self.info_log_lists.append(log_list)
+#                     # self.level = 'INFO'
+#                 # system pattern
+#                 elif re.match(pattern_system,log_list):
+#                     self.system_log_lists.append(log_list)
+#                     # self.level = 'SYSTEM'
             
 
 #邮件地址
@@ -144,7 +187,7 @@ def ssh_connect(hostname, port, username, password):
         pass
 
 def get_ssh_newest_file():
-    # last_file = []
+    # newest_file = []
     ssh = ssh_connect('120.27.220.53', 8222, 'hsplan', 'wUrSLSoE%Jaih*sx%M')
     # log_file = "biz-service-info.log"
     # command_cat = "cat /var/log/ppss_biz_service/" + log_file + "|grep ERROR"
@@ -153,16 +196,16 @@ def get_ssh_newest_file():
     output = stdout.readlines()
     for i in range(len(output)):
         newest_file = output[i].strip()
-        if pattern_info.match(newest_file):
+        if pattern_info_file.match(newest_file):
             print(newest_file)
             ssh.close()
             return newest_file
-        # last_file.append(line)
+        # newest_file.append(line)
         # if line not in ssh_newest_file:
         #     ssh_newest_file.append(line)
             # print(line)
     # print(ssh_newest_file)
-    # return last_file
+    # return newest_file
 
 def cat_ssh_newest_file(directory):
     # directory = "/var/log/ppss_biz_service/"
@@ -197,13 +240,14 @@ def read_ssh_newest_file():
         sdin, stdout, stderr = ssh.exec_command(command_cat)
         log_type = 'BIZ'
         log_level = 'ERROR'
+        create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         lines = stdout.readlines()
         for i in range(len(lines)):
             line = lines[i].strip()
             if line:
                 print(line)
-                cursor.execute("INSERT INTO log_analyze_bizserviceerror (log_type,log_level,content) VALUES (%s,%s,%s)",
-                                [log_type,log_level,line])
+                cursor.execute("INSERT INTO log_analyze_bizserviceerror (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)",
+                                [log_type,log_level,line,create_time])
                 conn.commit()
         command_tail = "tail -F " + directory + ssh_newest_file+"|grep ERROR"
         stdin, stdout, stderr = ssh.exec_command(command_tail)
@@ -247,59 +291,1078 @@ def search_new_file(dirname):
                 stat_info = os.stat(os.path.join(directory, f))
                 file_mtime[f] = stat_info.st_mtime
 
-    last_file = max(file_mtime, key=file_mtime.get)
+    newest_file = max(file_mtime, key=file_mtime.get)
 
-    # if last_file not in local_newest_files:
-    #     local_newest_files.append(last_file)
-    #     # new_file_path = os.path.join(directory,last_file)
-    #     print("newest file is: ",last_file)
-    return last_file
+    # if newest_file not in local_newest_files:
+    #     local_newest_files.append(newest_file)
+    #     # new_file_path = os.path.join(directory,newest_file)
+    #     print("newest file is: ",newest_file)
+    return newest_file
 
-def read_new_file(dirname):
-    # errors = []
-    # global offset
-    # dirname = '/var/log/'
+def read_biz_new_file():
+    key = 'biz'
+    dirname = dirname_dict[key]
     conn = pymysql_conn()
     cursor = conn.cursor()
-    log_type = 'SYSTEM'
-    log_level = 'COMMON'
-    table = 'bizserviceerror'
-    insert = "INSERT INTO log_analyze_"+table+" (log_type,log_level,content) VALUES (%s,%s,%s)"
-    last_file = search_new_file(dirname)
-    print("正在监控的文件： ",last_file)
-    last_file_path = os.path.join(dirname,last_file)
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
     # file_size = os.path.getsize(last_file_path)
-    with open(last_file_path) as f:
-        try:
-            with open(dirname+'offset.txt') as f_off:
-                # 获取当前文件自上次读取后的偏移量
-                offset = f_off.read().strip()
-                print("读取后的offset: ",offset)
-                file_size = os.path.getsize(last_file_path)
-                if file_size < int(offset):
-                    offset = 0
-                    print("新文件的offset: ",offset)
-        except FileNotFoundError:
-            offset = 0
-            print("offset文件不存在: ",offset)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
             
-        f.seek(int(offset),0)
-        while True:
-            line = f.readline().rstrip()
-            if not line:
-                break
-            elif re.match(pattern_admin,line):
-                print(line)
-                cursor.execute(insert,[log_type,log_level,line])
-                conn.commit()
-        offset = f.tell()
-        
-        with open(dirname+'offset.txt','w') as f_off:
-            # 将操作文件后的偏移量以覆盖方式存入文件
-            f_off.write(str(offset))
-    cursor.close()
-    conn.close()
-    
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_alibblife_new_file():
+    key = 'alibblife'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_admin_new_file():
+    key = 'admin'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_alilife_new_file():
+    key = 'alilife'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_commun_new_file():
+    key = 'commun'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_config_new_file():
+    key = 'config'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_mobile_new_file():
+    key = 'mobile'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_order_new_file():
+    key = 'order'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_pay_new_file():
+    key = 'pay'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_promotion_new_file():
+    key = 'promotion'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_shop_new_file():
+    key = 'shop'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_wap_new_file():
+    key = 'wap'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
+def read_wx_new_file():
+    key = 'wx'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()    
+
+def read_user_new_file():
+    key = 'user'
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
 def tail_file():
     dirname = '/var/log'
     last_file_path = os.path.join(dirname,search_new_file(dirname))
@@ -360,24 +1423,24 @@ def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0,
             format_next_time = next_run_time.strftime('%Y-%m-%d %H:%M:%S')
             continue
             
-
-
-from log_path import DEFAULT_PATH
-log_path = ['/var/log/','/var/log/nginx/','/etc/','/var/log/mysql/']
+def main():
+    tasks = ['read_user_new_file','read_wx_new_file',
+             'read_wap_new_file','read_shop_new_file',
+             'read_promotion_new_file','read_pay_new_file',
+             'read_order_new_file','read_mobile_new_file',
+             'read_config_new_file','read_commun_new_file',
+             'read_alilife_new_file','read_admin_new_file',
+             'read_alibblife_new_file','read_biz_new_file']
+    pool = Pool()
+    for task in tasks:
+        pool.apply_async(task)
+    pool.close()
+    pool.join()
+            
 if __name__=='__main__':
-    dirname = '/var/log/ppss_biz_service/'
-    timing_task(read_new_file,dirname)
-    # print('Parent process: ', os.getpid())
-    # p = Pool()
-    # for path in log_path:
-    #     print(path)
-    #     p.apply_async(timing_task, args=(read_new_file,path))
-    # print('Waiting for all subprocesses done...')
-    # p.close()
-    # p.join()
-    # print('All subprocesses done.')
+    main()
+
+    
 
 
 
-
-    # read_ssh_newest_file()
