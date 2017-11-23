@@ -17,7 +17,11 @@ tables = ['log_analyze_adminweberror',
           'log_analyze_shopserviceerror',
           'log_analyze_userserviceerror',
           'log_analyze_wapweberror',
-          'log_analyze_wxserviceerror',]
+          'log_analyze_wxserviceerror',
+          'log_analyze_remotebizinfo94',
+          'log_analyze_remotebizerror94',
+          'log_analyze_remotebizinfo98',
+          'log_analyze+remotebizerror98',]
 
 def pymysql_conn():
     # databases config

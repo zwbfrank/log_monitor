@@ -1,0 +1,27 @@
+{% extends "log_analyze/base_site.html" %}
+
+{% block content %}
+<p><a href="{% url 'index' %}"><strong>TestHost Log Monitor</strong></a></p>
+<ul>
+	<li><a href="{% url 'bizerror' %}">biz service error</a></li>
+	<li><a href="{% url 'adminerror' %}">admin web error</a></li>
+	<li><a href="{% url 'alilifeerror' %}">alilife service error</a></li>
+	<li><a href="{% url 'communerror' %}">communication service error</a></li>
+	<li><a href="{% url 'configerror' %}">config service error</a></li>
+	<li><a href="{% url 'mobileerror' %}">mobile web error</a></li>
+	<li><a href="{% url 'ordererror' %}">order service error</a></li>
+	<li><a href="{% url 'payerror' %}">pay service error</a></li>
+	<li><a href="{% url 'promotionerror' %}">promotion service error</a></li>
+	<li><a href="{% url 'shoperror' %}">shop service error</a></li>
+	<li><a href="{% url 'usererror' %}">user service error</a></li>
+	<li><a href="{% url 'waperror' %}">wap web error</a></li>
+	<li><a href="{% url 'wxerror' %}">wx service error</a></li>
+</ul>
+{% endblock %}
+
+
+
+
+
+
+

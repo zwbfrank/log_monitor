@@ -7,7 +7,7 @@ from .models import UserLogInfo
 from .models import LogLevel
 from .models import BizServiceError
 from .models import AdminWebError
-from .models import AlibblifeWebError
+# from .models import AlibblifeWebError
 from .models import AlilifeServiceError
 from .models import CommunicationServiceError
 from .models import ConfigServiceError
@@ -32,7 +32,7 @@ admin.site.register(UserLogInfo)
 admin.site.register(LogLevel)
 admin.site.register(BizServiceError)
 admin.site.register(AdminWebError)
-admin.site.register(AlibblifeWebError)
+# admin.site.register(AlibblifeWebError)
 admin.site.register(AlilifeServiceError)
 admin.site.register(CommunicationServiceError)
 admin.site.register(ConfigServiceError)

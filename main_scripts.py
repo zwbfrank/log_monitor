@@ -43,7 +43,6 @@ dirname_dict = {
     'user': '/var/log/ppss_user_service',
 }
 
-
 table_dict = {
     'biz': 'log_analyze_bizserviceerror',
     'alibblife': 'log_analyze_alibblifeweberror',
@@ -61,7 +60,6 @@ table_dict = {
     'user': 'log_analyze_userserviceerror',
 }
 
-
 # 匹配模式
 pattern_error         = r'.*\[ERROR\].*'
 pattern_warning       = r'.*WARNING.*'
@@ -75,7 +73,6 @@ pattern_warning       = re.compile(pattern_warning)
 pattern_info_file     = re.compile(pattern_info_file)
 pattern_system        = re.compile(pattern_system)
 pattern_error_file    = re.compile(pattern_error_file)
-
 
 def pymysql_conn():
     # databases config
@@ -106,50 +103,50 @@ def get_log_path_data():
     return data
 
     
-# class LogAnalyze():
-#
-#     """
-#         Log analyze.
-#     """
-#
-#     def __init__(self,log_path):
-#         self.log_path = log_path
-#         self.error_log_lists   = []
-#         self.warning_log_lists = []
-#         self.info_log_lists    = []
-#         self.system_log_lists  = []
-#         self.level = ''
-#
-#     def get_log_lists(self):
-#         try:
-#             with open(self.log_path,'r',errors='ignore') as f_obj:
-#                 log_lists = f_obj.readlines()
-#         except FileNotFoundError:
-#             pass
-#         else:
-#             return log_lists
-#
-#     def log_analyze(self):
-#         log_lists = self.get_log_lists()
-#         for log_list in log_lists:
-#             if log_list:
-#                 # 日志错误信息匹配模式
-#                 if re.match(pattern_error,log_list):
-#                     self.error_log_lists.append(log_list)
-#                     # self.level = 'ERROR'
-#                 # 警告信息匹配模式
-#                 elif re.match(pattern_warning,log_list):
-#                     # send_email(log_list)
-#                     self.warning_log_lists.append(log_list)
-#                     # self.level = 'WARNING'
-#                 # info pattern
-#                 elif re.match(pattern_info,log_list):
-#                     self.info_log_lists.append(log_list)
-#                     # self.level = 'INFO'
-#                 # system pattern
-#                 elif re.match(pattern_system,log_list):
-#                     self.system_log_lists.append(log_list)
-#                     # self.level = 'SYSTEM'
+class LogAnalyze():
+
+    """
+        Log analyze.
+    """
+
+    def __init__(self,log_path):
+        self.log_path = log_path
+        self.error_log_lists   = []
+        self.warning_log_lists = []
+        self.info_log_lists    = []
+        self.system_log_lists  = []
+        self.level = ''
+
+    def get_log_lists(self):
+        try:
+            with open(self.log_path,'r',errors='ignore') as f_obj:
+                log_lists = f_obj.readlines()
+        except FileNotFoundError:
+            pass
+        else:
+            return log_lists
+
+    def log_analyze(self):
+        log_lists = self.get_log_lists()
+        for log_list in log_lists:
+            if log_list:
+                # 日志错误信息匹配模式
+                if re.match(pattern_error,log_list):
+                    self.error_log_lists.append(log_list)
+                    # self.level = 'ERROR'
+                # 警告信息匹配模式
+                elif re.match(pattern_warning,log_list):
+                    # send_email(log_list)
+                    self.warning_log_lists.append(log_list)
+                    # self.level = 'WARNING'
+                # info pattern
+                elif re.match(pattern_info,log_list):
+                    self.info_log_lists.append(log_list)
+                    # self.level = 'INFO'
+                # system pattern
+                elif re.match(pattern_system,log_list):
+                    self.system_log_lists.append(log_list)
+                    # self.level = 'SYSTEM'
             
 
 #邮件地址
@@ -1363,6 +1360,81 @@ def read_user_new_file():
         cursor.close()
         conn.close()
 
+def read_log_new_file(key):
+    dirname = dirname_dict[key]
+    conn = pymysql_conn()
+    cursor = conn.cursor()
+    log_type = 'HSPLAN'
+    log_level = 'ERROR'
+    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    table = table_dict[key]
+    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
+    newest_file = search_new_file(dirname)
+    print("正在监控的文件： ",newest_file)
+    newest_file_path = os.path.join(dirname,newest_file)
+    offset_path = os.path.dirname(os.path.abspath(__file__))
+    # file_size = os.path.getsize(last_file_path)
+    with open(newest_file_path) as f:
+        if pattern_info_file.match(newest_file):            
+            try:
+                with open(offset_path+'/offset/'+key+'_info_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/offset/'+key+'_info_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+        if pattern_error_file.match(newest_file):
+            try:
+                with open(offset_path+'/offset/'+key+'_error_offset.txt') as f_off:
+                    # 获取当前文件自上次读取后的偏移量
+                    offset = f_off.read().strip()
+                    print("读取后的offset: ",offset)
+                    file_size = os.path.getsize(newest_file_path)
+                    if file_size < int(offset):
+                        offset = 0
+                        print("新文件的offset: ",offset)
+            except FileNotFoundError:
+                offset = 0
+                print("offset文件不存在: ",offset)
+                
+            f.seek(int(offset),0)
+            while True:
+                line = f.readline().rstrip()
+                if not line:
+                    break
+                elif re.match(pattern_error,line):
+                    print(line)
+                    cursor.execute(insert,[log_type,log_level,line,create_time])
+                    conn.commit()
+            offset = f.tell()
+            
+            with open(offset_path+'/offset/'+key+'_error_offset.txt','w') as f_off:
+                # 将操作文件后的偏移量以覆盖方式存入文件
+                f_off.write(str(offset))
+
+        cursor.close()
+        conn.close()
+
 def tail_file():
     dirname = '/var/log'
     last_file_path = os.path.join(dirname,search_new_file(dirname))
@@ -1424,21 +1496,34 @@ def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0,
             continue
             
 def main():
-    tasks = ['read_user_new_file','read_wx_new_file',
-             'read_wap_new_file','read_shop_new_file',
-             'read_promotion_new_file','read_pay_new_file',
-             'read_order_new_file','read_mobile_new_file',
-             'read_config_new_file','read_commun_new_file',
-             'read_alilife_new_file','read_admin_new_file',
-             'read_alibblife_new_file','read_biz_new_file']
+    tasks = [read_user_new_file,
+             read_wx_new_file,
+             read_wap_new_file,
+             read_shop_new_file,
+             read_promotion_new_file,
+             read_pay_new_file,
+             read_order_new_file,
+             read_mobile_new_file,
+             read_config_new_file,
+             read_commun_new_file,
+             read_alilife_new_file,
+             read_admin_new_file,
+             read_biz_new_file]
     pool = Pool()
-    for task in tasks:
-        pool.apply_async(task)
+    for key in table_dict:
+        pool.apply(read_log_new_file,(key,))
     pool.close()
     pool.join()
             
 if __name__=='__main__':
     main()
+
+
+
+
+        
+
+
 
     
 

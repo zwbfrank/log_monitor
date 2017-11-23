@@ -19,6 +19,40 @@ TYPE_CHOICES = (
 
 
 # Create your models here.
+
+class RemoteBizInfo94(models.Model):
+    content = models.TextField()
+    create_time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.content
+
+
+class RemoteBizError94(models.Model):
+    content = models.TextField()
+    create_time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.content
+
+
+class RemoteBizInfo98(models.Model):
+    content = models.TextField()
+    create_time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.content
+
+
+class RemoteBizError98(models.Model):
+    content = models.TextField()
+    create_time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.content
+
+
+
 class LogMonitor(models.Model):
     log_type = models.CharField(max_length=100,choices=TYPE_CHOICES)
     log_path = models.CharField(max_length=500)
@@ -99,14 +133,14 @@ class AdminWebError(models.Model):
         return self.content
 
 
-class AlibblifeWebError(models.Model):
-    log_type = models.CharField(max_length=225)
-    log_level = models.CharField(max_length=225)
-    content = models.TextField()
-    create_time = models.DateTimeField(default=timezone.now)
+# class AlibblifeWebError(models.Model):
+#     log_type = models.CharField(max_length=225)
+#     log_level = models.CharField(max_length=225)
+#     content = models.TextField()
+#     create_time = models.DateTimeField(default=timezone.now)
 
-    def __str__(self):
-        return self.content
+#     def __str__(self):
+#         return self.content
 
 
 class AlilifeServiceError(models.Model):
