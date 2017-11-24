@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 # coding:utf-8
+"""
+模块名：test
+功能：将测试服务器日志实时存入数据库
+"""
+
 import os
 import re
 import signal
@@ -77,7 +82,6 @@ pattern_ppss          = re.compile(pattern_ppss)
 
 pattern_new_log       = re.compile(r'(.*error\.log)$|(.*info\.log)$')
 
-
 def pymysql_conn():
     # databases config
     config = {
@@ -116,6 +120,11 @@ def get_error_file(dirname):
             return file
 
 def read_info_new_file(key):
+    """
+    功能：读取info日志内容到数据库
+    :param key:
+    :return:
+    """
     conn = pymysql_conn()
     cursor = conn.cursor()
     log_type = 'HSPLAN'
@@ -157,8 +166,15 @@ def read_info_new_file(key):
                 f_offset.write(str(offset))
     except FileNotFoundError:
         pass
+    cursor.close()
+    conn.close()
 
 def read_error_new_file(key):
+    """
+    功能：读取error日志文件内容存到数据库
+    :param key:通过key可以获取字典中对应的日志目录和数据库表
+    :return:
+    """
     conn = pymysql_conn()
     cursor = conn.cursor()
     log_type = 'HSPLAN'
@@ -200,88 +216,31 @@ def read_error_new_file(key):
                 f_offset.write(str(offset))
     except FileNotFoundError:
         pass
-
-
-def read_log_new_file(key):
-    dirname = dirname_dict[key]
-    conn = pymysql_conn()
-    cursor = conn.cursor()
-    log_type = 'HSPLAN'
-    log_level = 'ERROR'
-    create_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    table = table_dict[key]
-    insert = "INSERT INTO "+table+" (log_type,log_level,content,create_time) VALUES (%s,%s,%s,%s)"
-    new_file_list = search_new_file(dirname)
-    print("正在监控的文件： ",newest_file)
-    newest_file_path = os.path.join(dirname,newest_file)
-    offset_path = os.path.dirname(os.path.abspath(__file__))
-    # file_size = os.path.getsize(last_file_path)
-    with open(newest_file_path) as f:
-        if pattern_info_file.match(newest_file):            
-            try:
-                with open(offset_path+'/offset/'+key+'_info_offset.txt') as f_off:
-                    # 获取当前文件自上次读取后的偏移量
-                    offset = f_off.read().strip()
-                    print("读取后的offset: ",offset)
-                    file_size = os.path.getsize(newest_file_path)
-                    if file_size < int(offset):
-                        offset = 0
-                        print("文件更新,初始化offset: ",offset)
-            except FileNotFoundError:
-                offset = 0
-                print("首次运行,初始化offset: ",offset)
-                
-            f.seek(int(offset),0)
-            while True:
-                line = f.readline().rstrip()
-                if not line:
-                    break
-                elif re.match(pattern_error,line):
-                    print(line)
-                    cursor.execute(insert,[log_type,log_level,line,create_time])
-                    conn.commit()
-            offset = f.tell()
-            
-            with open(offset_path+'/offset/'+key+'_info_offset.txt','w') as f_off:
-                # 将操作文件后的偏移量以覆盖方式存入文件
-                f_off.write(str(offset))
-        if pattern_error_file.match(newest_file):
-            try:
-                with open(offset_path+'/offset/'+key+'_error_offset.txt') as f_off:
-                    # 获取当前文件自上次读取后的偏移量
-                    offset = f_off.read().strip()
-                    print("读取后的offset: ",offset)
-                    file_size = os.path.getsize(newest_file_path)
-                    if file_size < int(offset):
-                        offset = 0
-                        print("新文件的offset: ",offset)
-            except FileNotFoundError:
-                offset = 0
-                print("offset文件不存在: ",offset)
-                
-            f.seek(int(offset),0)
-            while True:
-                line = f.readline().rstrip()
-                if not line:
-                    break
-                elif re.match(pattern_error,line):
-                    print(line)
-                    cursor.execute(insert,[log_type,log_level,line,create_time])
-                    conn.commit()
-            offset = f.tell()
-            
-            with open(offset_path+'/offset/'+key+'_error_offset.txt','w') as f_off:
-                # 将操作文件后的偏移量以覆盖方式存入文件
-                f_off.write(str(offset))
-
-        cursor.close()
-        conn.close()
+    cursor.close()
+    conn.close()
 
 def str2sec(t):
+    """
+    将字符格式时间转化成秒数
+    :param t:
+    :return: 以秒为单位的时间
+    """
     h,m,s = str(t).split(':')
     return int(h)*3600+int(m)*60+int(s)
 
 def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0, second=10):
+    """
+    功能：定时执行func任务
+    :param func:指定的方法名
+    :param arg:方法所需单个参数
+    :param args: 列表参数
+    :param kwargs:字典参数
+    :param day:以天为单位循环执行任务
+    :param hour:
+    :param minute:
+    :param second:
+    :return: None
+    """
     now_time = datetime.now()
     format_now_time = now_time.strftime('%Y-%m-%d %H:%M:%S')
     print("now: ", format_now_time)
@@ -297,10 +256,8 @@ def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0,
         # get current time
         now_time = datetime.now()
         format_now_time = now_time.strftime('%Y-%m-%d %H:%M:%S')
-        #print("sleeping...: "+str(sleep_time)+'s')
-        #sleep(sleep_time)
         if str(format_now_time) >= str(format_next_time):
-            print("start work: ",format_now_time)
+            print("start work:"+format_now_time)
             start_time = datetime.now()
             if arg is not None:
                 func(arg)
@@ -310,7 +267,6 @@ def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0,
                 func(**kwargs)
             else:
                 func()
-    
             end_time = datetime.now()
             task_time = end_time - start_time
             print("task done."+"\n\n")
@@ -320,6 +276,10 @@ def timing_task(func, arg=None, args=None, kwargs=None, day=0, hour=0, minute=0,
         sleep(1)
         
 def main():
+    """
+    多进程处理任务
+    pool是进程池对象
+    """
     pool = Pool()
     for key in table_dict:
         pool.apply(read_info_new_file,(key,))

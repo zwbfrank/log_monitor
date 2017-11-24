@@ -21,7 +21,7 @@ tables = ['log_analyze_adminweberror',
           'log_analyze_remotebizinfo94',
           'log_analyze_remotebizerror94',
           'log_analyze_remotebizinfo98',
-          'log_analyze+remotebizerror98',]
+          'log_analyze_remotebizerror98',]
 
 def pymysql_conn():
     # databases config
@@ -37,10 +37,8 @@ def pymysql_conn():
         conn = pymysql.connect(**config)
     except:
         print("Cannot connect into database.")
-    
     # cursor = conn.cursor()
     return conn
-
 
 def truncate(table):
     conn = pymysql_conn()
@@ -52,7 +50,6 @@ def truncate(table):
     cursor.close()
     conn.close()
     
-
 def main():
     for table in tables:
         truncate(table)

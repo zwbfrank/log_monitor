@@ -2,15 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1a8cbdd9-b74f-4665-977a-e127743fb2a4" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test_remote.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyze/admin.py" afterPath="$PROJECT_DIR$/log_analyze/admin.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyze/models.py" afterPath="$PROJECT_DIR$/log_analyze/models.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyze/templates/log_analyze/index.html" afterPath="$PROJECT_DIR$/log_analyze/templates/log_analyze/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyze/templates/log_analyze/wxerror.html" afterPath="$PROJECT_DIR$/log_analyze/templates/log_analyze/wxerror.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyze/urls.py" afterPath="$PROJECT_DIR$/log_analyze/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log_analyze/views.py" afterPath="$PROJECT_DIR$/log_analyze/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main_scripts.py" afterPath="$PROJECT_DIR$/main_scripts.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/offset.txt" afterPath="$PROJECT_DIR$/offset.txt" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/main_scripts.py" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/clean.py" afterPath="$PROJECT_DIR$/clean.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/remote.py" afterPath="$PROJECT_DIR$/remote.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test.py" afterPath="$PROJECT_DIR$/test.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -37,20 +32,18 @@
       <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="131">
-              <caret line="308" column="36" lean-forward="true" selection-start-line="308" selection-start-column="36" selection-end-line="308" selection-end-column="36" />
-              <folding>
-                <element signature="e#37#46#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="-841">
+              <caret line="217" column="12" lean-forward="true" selection-start-line="217" selection-start-column="12" selection-end-line="217" selection-end-column="12" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="remote.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="remote.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/remote.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="486">
-              <caret line="69" column="11" lean-forward="true" selection-start-line="69" selection-start-column="11" selection-end-line="69" selection-end-column="11" />
+            <state relative-caret-position="414">
+              <caret line="53" column="7" lean-forward="true" selection-start-line="53" selection-start-column="7" selection-end-line="53" selection-end-column="7" />
               <folding />
             </state>
           </provider>
@@ -59,7 +52,7 @@
       <file leaf-file-name="admin.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/log_analyze/admin.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-49">
+            <state relative-caret-position="162">
               <caret line="30" column="32" lean-forward="false" selection-start-line="30" selection-start-column="32" selection-end-line="30" selection-end-column="32" />
               <folding>
                 <element signature="e#0#32#0" expanded="true" />
@@ -71,7 +64,7 @@
       <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/log_analyze/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
+            <state relative-caret-position="468">
               <caret line="28" column="43" lean-forward="false" selection-start-line="28" selection-start-column="43" selection-end-line="28" selection-end-column="43" />
               <folding>
                 <element signature="e#25#57#0" expanded="true" />
@@ -83,8 +76,8 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/log_analyze/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="684">
-              <caret line="68" column="62" lean-forward="true" selection-start-line="68" selection-start-column="62" selection-end-line="68" selection-end-column="62" />
+            <state relative-caret-position="900">
+              <caret line="68" column="62" lean-forward="false" selection-start-line="68" selection-start-column="62" selection-end-line="68" selection-end-column="62" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
                 <marker date="1511416823468" expanded="true" signature="1266:1307" ph="..." />
@@ -97,7 +90,7 @@
         <entry file="file://$PROJECT_DIR$/log_monitor/settings.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="306">
-              <caret line="17" column="31" lean-forward="true" selection-start-line="17" selection-start-column="31" selection-end-line="17" selection-end-column="31" />
+              <caret line="17" column="31" lean-forward="false" selection-start-line="17" selection-start-column="31" selection-end-line="17" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -106,43 +99,29 @@
       <file leaf-file-name="dev_settings.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/log_monitor/dev_settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="918">
+            <state relative-caret-position="1836">
               <caret line="102" column="64" lean-forward="false" selection-start-line="102" selection-start-column="64" selection-end-line="102" selection-end-column="64" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="django_uwsgi.ini" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/django_uwsgi.ini">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="396">
-              <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="clean.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="clean.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/clean.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="19" column="39" lean-forward="true" selection-start-line="19" selection-start-column="39" selection-end-line="19" selection-end-column="39" />
+            <state relative-caret-position="581">
+              <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main_scripts.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main_scripts.py">
+      <file leaf-file-name="log_path.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/log_path.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="684">
-              <caret line="100" column="18" lean-forward="true" selection-start-line="100" selection-start-column="18" selection-end-line="100" selection-end-column="18" />
-              <folding>
-                <marker date="1511401372432" expanded="true" signature="7382:7468" ph="INSERT INTO log_analyze_bizserviceerror... " />
-                <marker date="1511401372432" expanded="true" signature="8301:8402" ph="INSERT INTO log_analyze_bizserviceerror... " />
-                <marker date="1511401372432" expanded="true" signature="55930:56014" ph="INSERT INTO log_analyze_adminweberror... " />
-              </folding>
+            <state relative-caret-position="90">
+              <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -175,14 +154,15 @@
         <option value="$PROJECT_DIR$/config.py" />
         <option value="$PROJECT_DIR$/log_analyze/templates/log_analyze/index.html" />
         <option value="$PROJECT_DIR$/log_analyze/migrations/0001_initial.py" />
-        <option value="$PROJECT_DIR$/clean.py" />
         <option value="$PROJECT_DIR$/main_script_bak.py" />
-        <option value="$PROJECT_DIR$/main_scripts.py" />
         <option value="$PROJECT_DIR$/log_analyze/admin.py" />
-        <option value="$PROJECT_DIR$/test.py" />
         <option value="$PROJECT_DIR$/log_analyze/views.py" />
         <option value="$PROJECT_DIR$/log_analyze/urls.py" />
         <option value="$PROJECT_DIR$/test_remote.py" />
+        <option value="$PROJECT_DIR$/clean.py" />
+        <option value="$PROJECT_DIR$/test.py" />
+        <option value="$PROJECT_DIR$/remote.py" />
+        <option value="$PROJECT_DIR$/main_scripts.py" />
       </list>
     </option>
   </component>
@@ -192,7 +172,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="140" />
     <option name="y" value="53" />
     <option name="width" value="1398" />
@@ -421,20 +401,20 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="-4" width="1535" height="904" extended-state="6" />
+    <frame x="140" y="53" width="1537" height="912" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19674267" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.0012531328" sideWeight="0.5022801" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.45112783" sideWeight="0.49771988" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32957393" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.45112783" sideWeight="0.49771988" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39974937" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39974937" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -507,7 +487,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2340">
           <caret line="131" column="19" lean-forward="false" selection-start-line="131" selection-start-column="19" selection-end-line="131" selection-end-column="19" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -541,13 +520,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/offset.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="4" lean-forward="true" selection-start-line="0" selection-start-column="4" selection-end-line="0" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/offset.txt" />
     <entry file="file://$PROJECT_DIR$/log_analyze/forms.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -559,27 +532,15 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
           <caret line="8" column="23" lean-forward="false" selection-start-line="8" selection-start-column="23" selection-end-line="8" selection-end-column="23" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/biz_offset" />
-    <entry file="file://$PROJECT_DIR$/log_path.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
-          <folding>
-            <marker date="1510993364980" expanded="true" signature="31:471" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config.py" />
     <entry file="file://$PROJECT_DIR$/log_analyze/templates/log_analyze/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
           <caret line="15" column="40" lean-forward="false" selection-start-line="15" selection-start-column="40" selection-end-line="15" selection-end-column="40" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -587,7 +548,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
           <caret line="20" column="19" lean-forward="false" selection-start-line="20" selection-start-column="19" selection-end-line="20" selection-end-column="19" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -596,25 +556,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="252">
           <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding>
-            <element signature="e#73#112#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main_script_bak.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="1425" column="24" lean-forward="true" selection-start-line="1425" selection-start-column="24" selection-end-line="1425" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/main_script_bak.py" />
     <entry file="file://$PROJECT_DIR$/log_analyze/templates/log_analyze/bizerror.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -622,7 +571,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="194">
           <caret line="1598" column="0" lean-forward="false" selection-start-line="1598" selection-start-column="0" selection-end-line="1598" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -630,7 +578,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
           <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -638,52 +585,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="378">
           <caret line="226" column="47" lean-forward="false" selection-start-line="226" selection-start-column="47" selection-end-line="226" selection-end-column="47" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-            <marker date="1511403288323" expanded="true" signature="1228:1494" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="1465:1494" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="1531:1858" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="1818:1858" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="1896:2139" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="2111:2139" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="2175:2418" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="2390:2418" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="2453:2696" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="2668:2696" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="2728:2928" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="2902:2928" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="2967:3210" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="3182:3210" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="3247:3490" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="3462:3490" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="3493:3788" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="3831:4074" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="4046:4074" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="4123:4366" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="4338:4366" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="4408:4651" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="4623:4651" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="4689:4932" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="4904:4932" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="4973:5216" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="5188:5216" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="5255:5498" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="5470:5498" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="5543:5786" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="5758:5786" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="5826:6069" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="6041:6069" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="6109:6352" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="6324:6352" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="6387:6630" ph="..." />
-            <marker date="1511403288323" expanded="true" signature="6602:6630" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/log_analyze/admin.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-49">
+        <state relative-caret-position="162">
           <caret line="30" column="32" lean-forward="false" selection-start-line="30" selection-start-column="32" selection-end-line="30" selection-end-column="32" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
@@ -695,13 +602,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-900">
           <caret line="7" column="8" lean-forward="false" selection-start-line="7" selection-start-column="8" selection-end-line="7" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/log_analyze/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
+        <state relative-caret-position="468">
           <caret line="28" column="43" lean-forward="false" selection-start-line="28" selection-start-column="43" selection-end-line="28" selection-end-column="43" />
           <folding>
             <element signature="e#25#57#0" expanded="true" />
@@ -711,8 +617,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/log_analyze/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="684">
-          <caret line="68" column="62" lean-forward="true" selection-start-line="68" selection-start-column="62" selection-end-line="68" selection-end-column="62" />
+        <state relative-caret-position="900">
+          <caret line="68" column="62" lean-forward="false" selection-start-line="68" selection-start-column="62" selection-end-line="68" selection-end-column="62" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
             <marker date="1511416823468" expanded="true" signature="1266:1307" ph="..." />
@@ -723,69 +629,57 @@
     <entry file="file://$PROJECT_DIR$/log_monitor/settings.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
-          <caret line="17" column="31" lean-forward="true" selection-start-line="17" selection-start-column="31" selection-end-line="17" selection-end-column="31" />
+          <caret line="17" column="31" lean-forward="false" selection-start-line="17" selection-start-column="31" selection-end-line="17" selection-end-column="31" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/log_monitor/dev_settings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="918">
+        <state relative-caret-position="1836">
           <caret line="102" column="64" lean-forward="false" selection-start-line="102" selection-start-column="64" selection-end-line="102" selection-end-column="64" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_remote.py" />
+    <entry file="file://$PROJECT_DIR$/django_uwsgi.ini" />
+    <entry file="file://$PROJECT_DIR$/clean.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="581">
+          <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log_path.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main_scripts.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="684">
-          <caret line="100" column="18" lean-forward="true" selection-start-line="100" selection-start-column="18" selection-end-line="100" selection-end-column="18" />
-          <folding>
-            <marker date="1511401372432" expanded="true" signature="7382:7468" ph="INSERT INTO log_analyze_bizserviceerror... " />
-            <marker date="1511401372432" expanded="true" signature="8301:8402" ph="INSERT INTO log_analyze_bizserviceerror... " />
-            <marker date="1511401372432" expanded="true" signature="55930:56014" ph="INSERT INTO log_analyze_adminweberror... " />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test_remote.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="365">
-          <caret line="232" column="26" lean-forward="true" selection-start-line="232" selection-start-column="26" selection-end-line="232" selection-end-column="26" />
+        <state relative-caret-position="-180">
+          <caret line="389" column="19" lean-forward="true" selection-start-line="389" selection-start-column="19" selection-end-line="389" selection-end-column="19" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="131">
-          <caret line="308" column="36" lean-forward="true" selection-start-line="308" selection-start-column="36" selection-end-line="308" selection-end-column="36" />
-          <folding>
-            <element signature="e#37#46#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-841">
+          <caret line="217" column="12" lean-forward="true" selection-start-line="217" selection-start-column="12" selection-end-line="217" selection-end-column="12" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/remote.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="486">
-          <caret line="69" column="11" lean-forward="true" selection-start-line="69" selection-start-column="11" selection-end-line="69" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/django_uwsgi.ini">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/clean.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="19" column="39" lean-forward="true" selection-start-line="19" selection-start-column="39" selection-end-line="19" selection-end-column="39" />
+        <state relative-caret-position="414">
+          <caret line="53" column="7" lean-forward="true" selection-start-line="53" selection-start-column="7" selection-end-line="53" selection-end-column="7" />
           <folding />
         </state>
       </provider>

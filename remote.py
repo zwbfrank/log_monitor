@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # coding:utf-8
+"""
+模块名：remote
+功能：将远程服务器日志实时存入数据库
+"""
 import os
 import re
 import signal
@@ -44,6 +48,10 @@ pattern_new_log       = re.compile(r'(.*error\.log)$|(.*info\.log)$')
 
 
 def pymysql_conn():
+    """
+    功能:连接到数据库
+    :return: 数据库连接对象
+    """
     # databases config
     config = {
         'db': 'log_monitor',
@@ -56,12 +64,19 @@ def pymysql_conn():
     try:
         conn = pymysql.connect(**config)
     except:
-        print("Cannot connect into database.")
-    
+        print("Cannot connect into database.")  
     # cursor = conn.cursor()
     return conn
 
 def ssh_connect(hostname, port, username, password):
+    """
+    功能：建立ssh连接
+    :param hostname:
+    :param port:
+    :param username:
+    :param password:
+    :return: ssh对象
+    """
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
@@ -71,11 +86,8 @@ def ssh_connect(hostname, port, username, password):
         pass
 
 def get_94_info_file():
-    # newest_file = []
     #ssh = ssh_connect('120.27.220.53', 8222, 'hsplan', 'wUrSLSoE%Jaih*sx%M')
     ssh = ssh_connect('116.62.57.219',8222,'hsplan','Li&2FMBQvsaO3mi6Ez')
-    # log_file = "biz-service-info.log"
-    # command_cat = "cat /var/log/ppss_biz_service/" + log_file + "|grep ERROR"
     command_ls = "ls -rt /var/log/ppss_biz_service|tail -2"
     stdin, stdout, stderr = ssh.exec_command(command_ls)
     output = stdout.readlines()
@@ -87,7 +99,6 @@ def get_94_info_file():
             return newest_file
 
 def get_94_error_file():
-    # newest_file = []
     #ssh = ssh_connect('120.27.220.53', 8222, 'hsplan', 'wUrSLSoE%Jaih*sx%M')
     ssh = ssh_connect('116.62.57.219',8222,'hsplan','Li&2FMBQvsaO3mi6Ez')
     # log_file = "biz-service-info.log"
@@ -114,18 +125,16 @@ def tail_94_info_file():
     biz_info = get_94_info_file()
     command_tail = "tail -F " + directory + biz_info
     stdin, stdout, stderr = ssh.exec_command(command_tail)
-    try:
-        while True:
-            #sleep(1)
-            output = stdout.readline().strip()
-            if not output:
-                continue
-            print('ssh94 info: ',output)
-            cursor.execute(insert,[output,create_time])
-            conn.commit()
-    except Exception as e:
-        cursor.close()
-        conn.close()
+    while True:
+        sleep(0.1)
+        output = stdout.readline().strip()
+        if not output:
+            continue
+        print('ssh94 info: ',output)
+        cursor.execute(insert,[output,create_time])
+        conn.commit()
+    cursor.close()
+    conn.close()
 
 def tail_94_error_file():
     conn = pymysql_conn()
@@ -139,21 +148,18 @@ def tail_94_error_file():
     biz_error = get_94_error_file()
     command_tail = "tail -F " + directory + biz_error
     stdin, stdout, stderr = ssh.exec_command(command_tail)
-    try:
-        while True:
-            #sleep(1)
-            output = stdout.readline().strip()
-            if not output:
-                continue
-            print('ssh94 error: ',output)
-            cursor.execute(insert,[output,create_time])
-            conn.commit()
-    except Exception as e:
-        cursor.close()
-        conn.close()
+    while True:
+        sleep(0.1)
+        output = stdout.readline().strip()
+        if not output:
+            continue
+        print('ssh94 error: ',output)
+        cursor.execute(insert,[output,create_time])
+        conn.commit()
+    cursor.close()
+    conn.close()
         
 def get_98_info_file():
-    # newest_file = []
     ssh = ssh_connect('120.27.222.33', 8222, 'hsplan', 'd3h%lM670%AVCuV5qG')
     #ssh = ssh_connect('116.62.57.219',8222,'hsplan','Li&2FMBQvsaO3mi6Ez')
     # log_file = "biz-service-info.log"
@@ -169,7 +175,6 @@ def get_98_info_file():
             return newest_file
 
 def get_98_error_file():
-    # newest_file = []
     ssh = ssh_connect('120.27.222.33', 8222, 'hsplan', 'd3h%lM670%AVCuV5qG')
     #ssh = ssh_connect('116.62.57.219',8222,'hsplan','Li&2FMBQvsaO3mi6Ez')
     # log_file = "biz-service-info.log"
@@ -196,18 +201,16 @@ def tail_98_info_file():
     biz_info = get_98_info_file()
     command_tail = "tail -F " + directory + biz_info
     stdin, stdout, stderr = ssh.exec_command(command_tail)
-    try:
-        while True:
-            #sleep(1)
-            output = stdout.readline().strip()
-            if not output:
-                continue
-            print('ssh98 info: ',output)
-            cursor.execute(insert,[output,create_time])
-            conn.commit()
-    except Exception as e:
-        cursor.close()
-        conn.close()
+    while True:
+        sleep(0.1)
+        output = stdout.readline().strip()
+        if not output:
+            continue
+        print('ssh98 info: ',output)
+        cursor.execute(insert,[output,create_time])
+        conn.commit()
+    cursor.close()
+    conn.close()
 
 def tail_98_error_file():
     conn = pymysql_conn()
@@ -221,22 +224,20 @@ def tail_98_error_file():
     biz_error = get_98_error_file()
     command_tail = "tail -F " + directory + biz_error
     stdin, stdout, stderr = ssh.exec_command(command_tail)
-    try:
-        while True:
-            #sleep(1)
-            output = stdout.readline().strip()
-            if not output:
-                continue
-            print('ssh98 error: ',output)
-            cursor.execute(insert,[output,create_time])
-            conn.commit()
-    except Exception as e:
-        cursor.close()
-        conn.close()
+    while True:
+        sleep(0.1)
+        output = stdout.readline().strip()
+        if not output:
+            continue
+        print('ssh98 error: ',output)
+        cursor.execute(insert,[output,create_time])
+        conn.commit()
+    cursor.close()
+    conn.close()
 
 def main():
     tasks = (tail_94_info_file,tail_94_error_file,tail_98_info_file,tail_98_error_file)
-    pool = Pool(4)
+    pool = Pool()
     for task in tasks:
         pool.apply_async(task)
     pool.close()
